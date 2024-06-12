@@ -2,7 +2,6 @@
 Custom functions and code created to improve a spreadsheet that is used for tracking and managing inventory.
 Created by Makaela Wesner
 
-/*
 -------------------------------------------------
 Function File Locations
 -----
@@ -159,4 +158,3 @@ Planned/Suggested Features
 - Add the auto-date filling from the Requests transferring code to the code for moving Transfers and Complete rows, so there's one fewer fields to fill in. 
 
 -------------------------------------------------
-*/
