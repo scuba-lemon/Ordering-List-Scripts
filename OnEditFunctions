@@ -293,7 +293,25 @@ function onEditFormatRules(e) {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
   }
-} 
+}
+
+// For the Ordering List Sheet - Automatically inserts today's date into the list date cell whenever a new row is added
+function insertListDate(e) {
+  Logger.log("Insert List Date function triggered");
+  let currentRow = e.range.getRow();
+  let listDateCell = orderSheet.getRange(currentRow, 8, 1, 1);
+  listDateCell.setValue(formattedDate);
+}
+
+// For the MF for NP Sheet - Automatically inserts today's date into the list date cell whenever a new row is added
+function insertNPListDate(e) {
+  Logger.log("Insert List Date function triggered");
+  if (e.range.getNumColumns() == 1 && e.range.getNumRows() == 1 && e.range.getColumn() == 1) {
+    let currentRow = e.range.getRow();
+    let listDateCell = mfForNpSheet.getRange(currentRow, 3, 1, 1);
+    listDateCell.setValue(formattedDate);
+  }
+}
 
 // Runs the correct functions with a 10 second time-out, based on which sheet is edited 
 function onEditSheetCheck(e) {
