@@ -370,20 +370,6 @@ function highlightDupicateNomos(originalRowIndex, duplicateRowIndex) {
   Logger.log("Duplicate row highlighted: " + duplicateRowIndex);
 }
 
-// For the Ordering List Sheet - Automatically inserts today's date into the list date cell whenever a new row is added
-function insertListDate(e) {
-  let currentRow = e.range.getRow();
-  let listDateCell = orderSheet.getRange(currentRow, 8, 1, 1);
-  listDateCell.setValue(formattedDate);
-}
-
-// For the MF for NP Sheet - Automatically inserts today's date into the list date cell whenever a new row is added
-function insertNPListDate(e) {
-  let currentRow = e.range.getRow();
-  let listDateCell = mfForNpSheet.getRange(currentRow, 3, 1, 1);
-  listDateCell.setValue(formattedDate);
-}
-
 // Compares the order date to today's date, and if the date is older than 14 days, the cells will be lined with a thick black border
 function compareDates(valueInColumnI, row) {
   let parsedDate = parseDate(valueInColumnI);
