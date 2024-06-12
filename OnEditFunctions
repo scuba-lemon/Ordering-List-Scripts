@@ -1,0 +1,329 @@
+// Insert checkboxes on the MF for NP page when a new row is added for Vending transfers
+function onEditVendingCheckbox(e) {
+  let editedRange = e.range;
+  let editedRow = editedRange.getRow();
+
+  // Check if the edited cell is within the target range and in column G
+  let isIntersecting = editedRange.getColumn() == 7  // Column G
+
+  if (isIntersecting) {
+    Logger.log("onEditVendingCheckbox function triggered")
+    // Ignore rows 1-3
+    if (editedRow < 3) {
+      return;
+    }
+
+    // Gets the location of the cell in column K
+    let transferBoxTarget = mfForNpSheet.getRange(editedRow, 11);
+
+    // Applies the checkboxes to the target cells in the appropriate columns
+    transferBoxTarget.setDataValidation(checkBox);
+  }
+}
+
+// Generates drop-down menus and inserts checkboxes if the cell containing the category is edited on the Ordering List sheet
+function onEditTriggerDropDown(e) {
+  // Check if the edit occurred in the desired range
+  let editedRange = e.range;
+  let targetRangeA1Notation = 'B2:B';  // Adjust this to the desired range
+
+  // Check if the edited cell is within the target range
+  let targetRange = orderSheet.getRange(targetRangeA1Notation);
+  let isIntersecting =
+    editedRange.getRow() >= targetRange.getRow() &&
+    editedRange.getRow() <= targetRange.getLastRow() &&
+    editedRange.getColumn() == targetRange.getColumn() &&
+    editedRange.getColumn() == targetRange.getLastColumn();
+
+  if (isIntersecting) {
+    Logger.log("onEditTriggerDropDown function triggered");
+    let currentRow = e.range.getRow();
+    createBrandsMenu();
+    createSubCategoryMenu();
+    createCheckBoxes(currentRow);
+    insertListDate(e);
+  }
+}
+
+// Generates drop-down menus and inserts checkboxes if the cell containing the category is edited on the Ordering List sheet
+function onEditTriggerDevices(e) {
+  // Check if the edit occurred in the desired range
+  let editedRange = e.range;
+  let targetRangeA1Notation = 'C2:C';  // Adjust this to the desired range
+
+  // Check if the edited cell is within the target range
+  let targetRange = orderSheet.getRange(targetRangeA1Notation);
+  let isIntersecting =
+    editedRange.getRow() >= targetRange.getRow() &&
+    editedRange.getRow() <= targetRange.getLastRow() &&
+    editedRange.getColumn() == targetRange.getColumn() &&
+    editedRange.getColumn() == targetRange.getLastColumn();
+
+  if (isIntersecting) {
+    Logger.log("onEditTriggerDevices function triggered");
+    currentCell = orderSheet.getCurrentCell().offset(0, -1);
+    let categoryValue = currentCell.getValue();
+    Logger.log("Category Value: " + categoryValue);
+    if (categoryValue === "Coils & Pods") {
+      // Call your custom function here
+      createDevicesMenu();
+    }
+  }
+}
+
+// Updates the drop down menus for all categories and subcategories if the column containing the list is edited on the Drop Downs sheet
+function onEditUpdateDropdowns(e) {
+  let editedRange = e.range;
+  let targetRangeA1Notation = 'B2:H';  // Adjust this to the desired range
+
+  // Check if the edited cell is within the target range
+  let targetRange = orderSheet.getRange(targetRangeA1Notation);
+  let isIntersecting =
+    editedRange.getRow() >= targetRange.getRow() &&
+    editedRange.getRow() <= targetRange.getLastRow() &&
+    editedRange.getColumn() == targetRange.getColumn() &&
+    editedRange.getColumn() == targetRange.getLastColumn();
+
+  // Check which column was edited
+  let editedColumn = editedRange.getColumn();
+
+  // Call your custom function based on the edited column
+  if (isIntersecting) {
+    Logger.log("onEditUpdateDropdowns function triggered");
+    if (editedColumn == 2) {
+      Logger.log('Updating Delta Companies');
+      deltaCos.length = 0;
+      deltaCos.push(...makeArray('B', 2, dropDownSheet));
+    } else if (editedColumn == 3) {
+      Logger.log('Updating Vape Companies');
+      vapeCos.length = 0;
+      vapeCos.push(...makeArray('C', 3, dropDownSheet));
+    } else if (editedColumn == 4) {
+      Logger.log('Updating eLiquid Companies');
+      eLiquid.length = 0;
+      eLiquid.push(...makeArray('D', 4, dropDownSheet));
+    } else if (editedColumn == 5) {
+      Logger.log('Updating Disposable Companies');
+      dispoCos.length = 0;
+      dispoCos.push(...makeArray('E', 5, dropDownSheet));
+    } else if (editedColumn == 6) {
+      Logger.log('Updating Accessories Subcategories');
+      accessoriesSubs.length = 0;
+      accessoriesSubs.push(...makeArray('F', 6, dropDownSheet));
+    } else if (editedColumn == 7) {
+      Logger.log('Updating Delta Subcategories');
+      deltaSubs.length = 0;
+      deltaSubs.push(...makeArray('G', 7, dropDownSheet));
+    } else if (editedColumn == 8) {
+      Logger.log('Updating Stash Subcategories');
+      stashSubs.length = 0;
+      stashSubs.push(...makeArray('H', 8, dropDownSheet));
+    }
+  }
+}
+
+// Updates the drop down menus for devices if the column containing the list is edited on the Devices sheet
+function onEditUpdateDevices(e) {
+  let editedRange = e.range;
+  let targetRangeA1Notation = 'A2:R';  // Adjust this to the desired range
+
+  // Check if the edited cell is within the target range
+  let targetRange = orderSheet.getRange(targetRangeA1Notation);
+  let isIntersecting =
+    editedRange.getRow() >= targetRange.getRow() &&
+    editedRange.getRow() <= targetRange.getLastRow() &&
+    editedRange.getColumn() == targetRange.getColumn() &&
+    editedRange.getColumn() == targetRange.getLastColumn();
+
+  // Check which column was edited
+  let editedColumn = editedRange.getColumn();
+
+  // Call your custom function based on the edited column
+  if (isIntersecting) {
+    Logger.log("onEditUpdateDevices function triggered");
+    if (editedColumn == 1) {
+      Logger.log('Updating Aspire Devices');
+      aspireDevs.length = 0;
+      aspireDevs.push(...makeArray('A', 1, deviceSheet));
+    } else if (editedColumn == 2) {
+      Logger.log('Updating Dazzleaf Devices');
+      dazzleafDevs.length = 0;
+      dazzleafDevs.push(...makeArray('B', 2, deviceSheet));
+    } else if (editedColumn == 3) {
+      Logger.log('Updating Freemax Devices');
+      freemaxDevs.length = 0;
+      freemaxDevs.push(...makeArray('C', 3, deviceSheet));
+    } else if (editedColumn == 4) {
+      Logger.log('Updating Geekvape Devices');
+      geekvapeDevs.length = 0;
+      geekvapeDevs.push(...makeArray('D', 4, deviceSheet));
+    } else if (editedColumn == 5) {
+      Logger.log('Updating Horizontech Devices');
+      horizontechDevs.length = 0;
+      horizontechDevs.push(...makeArray('E', 5, deviceSheet));
+    } else if (editedColumn == 6) {
+      Logger.log('Updating Joyetech Devices');
+      joyetechDevs.length = 0;
+      joyetechDevs.push(...makeArray('F', 6, deviceSheet));
+    } else if (editedColumn == 7) {
+      Logger.log('Updating Juul Devices');
+      juulDevs.length = 0;
+      juulDevs.push(...makeArray('G', 7, deviceSheet));
+    } else if (editedColumn == 8) {
+      Logger.log('Updating Kangertech Devices');
+      kangertechDevs.length = 0;
+      kangertechDevs.push(...makeArray('H', 8, deviceSheet));
+    } else if (editedColumn == 9) {
+      Logger.log('Updating Lookah Devices');
+      lookahDevs.length = 0;
+      lookahDevs.push(...makeArray('I', 9, deviceSheet));
+    } else if (editedColumn == 10) {
+      Logger.log('Updating Lost Vape Devices');
+      lostvapeDevs.length = 0;
+      lostvapeDevs.push(...makeArray('J', 10, deviceSheet));
+    } else if (editedColumn == 11) {
+      Logger.log('Updating Moti x Play Devices');
+      motiXplayDevs.length = 0;
+      motiXplayDevs.push(...makeArray('K', 11, deviceSheet));
+    } else if (editedColumn == 12) {
+      Logger.log('Updating Puffco Devices');
+      puffcoDevs.length = 0;
+      puffcoDevs.push(...makeArray('L', 12, deviceSheet));
+    } else if (editedColumn == 13) {
+      Logger.log('Updating Smok Devices');
+      smokDevs.length = 0;
+      smokDevs.push(...makeArray('M', 13, deviceSheet));
+    } else if (editedColumn == 14) {
+      Logger.log('Updating Suorin Devices');
+      suorinDevs.length = 0;
+      suorinDevs.push(...makeArray('N', 14, deviceSheet));
+    } else if (editedColumn == 15) {
+      Logger.log('Updating Uwell Devices');
+      uwellDevs.length = 0;
+      uwellDevs.push(...makeArray('O', 15, deviceSheet));
+    } else if (editedColumn == 16) {
+      Logger.log('Updating Vaporesso Devices');
+      vaporessoDevs.length = 0;
+      vaporessoDevs.push(...makeArray('P', 16, deviceSheet));
+    } else if (editedColumn == 17) {
+      Logger.log('Updating Voopoo Devices');
+      voopooDevs.length = 0;
+      voopooDevs.push(...makeArray('Q', 17, deviceSheet));
+    } else if (editedColumn == 18) {
+      Logger.log('Updating Yocan Devices');
+      yocanDevs.length = 0;
+      yocanDevs.push(...makeArray('R', 18, deviceSheet));
+    } 
+  }
+}
+
+// Implement formatting rules on the Ordering List sheet based on the column that is edited
+function onEditFormatRules(e) {
+  Logger.log("onEditFormatRules function triggered");
+  let range = e.range;
+  let column = range.getColumn();
+  let row = range.getRow();
+  let finalRow = getLastDataRowInColumn("A", orderSheet);
+
+  if (column == 5 && row == finalRow ) {   // If the cell in the last row of column E is edited, check for duplicates & nomos
+    Logger.log("Duplicate check triggered");
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
+
+    let products = transposeData();
+    let indices = checkForDuplicateRow(e, products);
+    highlightDuplicateRows(indices.originalRowIndex, indices.duplicateRowIndex);
+
+    let nomoProducts = transposeNomos();
+    let nomoIndices = checkForDuplicateRow(e, nomoProducts);
+    highlightDupicateNomos(nomoIndices.originalRowIndex, nomoIndices.duplicateRowIndex);
+    
+  } else if (column == 9 && row > 1) {  // If the order date cell is filled, strikes through the row
+    Logger.log("Strikethrough check triggered");
+    let valueI = orderSheet.getRange(row, 9).getValue(); // Value in column I
+
+    if (valueI !== "") {
+      Logger.log("Order date filled - striking through the row")
+      orderSheet.getRange(row, 1, 1, 5).setFontLine("line-through");
+      compareDates(valueI, row);
+    }  else {
+      Logger.log("Order date cleared - removing strikethrough for the row")
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setFontLine(null);
+      // orderSheet.getRange(row, 8, 1, 2).setBorder(false, false, false, false, false, false); // Remove any border around the outside of cells in columns A-I of the current row
+      Logger.log("Order date cleared - removing the highlighting.")
+      orderSheet.getRange(row, 8, 1, 2).setBackground(null); // Remove the highlighting
+    }
+
+  } else if (column == 10) {  // If the "New" checkbox is checked, highlights the row
+    if (range.isChecked()) {
+      Logger.log('New check triggered')
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor); // Change the background color as needed
+    } else {
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
+    }
+
+  } else if (column == 12) {  // If the "Transfer" checkbox is checked, highlights the row
+    if (range.isChecked()) {
+      Logger.log('Transfer check triggered')
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor); // Change the background color as needed
+    } else {
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
+    }
+
+  } else if (column == 13) {  // If the "Nomo" checkbox is checked, highlights the row
+    if (range.isChecked()) {
+      Logger.log('Nomo check triggered');
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor); // Change the background color as needed
+    } else {
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
+    }
+
+  } else if (column == 14) {  // If the "Req" checkbox is checked, highlights the row
+    if (range.isChecked()) {
+      Logger.log('Req check triggered');
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(reqColor); // Change the background color as needed
+    } else {
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
+    }
+    
+  } else if (column == 15) {  // If the "Complete" checkbox is checked, highlights the row
+    if (range.isChecked()) {
+      Logger.log('Complete check triggered');
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor); // Change the background color as needed
+    } else {
+      orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
+    }
+  }
+} 
+
+// Runs the correct functions with a 10 second time-out, based on which sheet is edited 
+function onEditSheetCheck(e) {
+  Logger.log("onEditSheetCheck function triggered");
+  let sheetName = e.range.getSheet().getName();
+
+  // Timeout set in milliseconds, adjust as needed
+  if (sheetName === 'Drop Downs') {
+    Logger.log('Drop Downs sheet is being edited')
+    timeoutFunction(() => onEditUpdateDropdowns(e), 10000, 'onEditUpdateDropdowns');
+  } else if (sheetName === 'Devices') {
+    Logger.log('Devices Sheet is being edited');
+    timeoutFunction(() => onEditUpdateDevices(e), 10000, 'onEditUpdateDevices');
+  } else if (sheetName === 'Ordering List') {
+    Logger.log('Ordering List sheet is being edited');
+    timeoutFunction(() => onEditTriggerDropDown(e), 10000, 'onEditTriggerDropDowns');
+    timeoutFunction(() => onEditTriggerDevices(e), 10000, 'onEditTriggerDevices');
+    timeoutFunction(() => onEditFormatRules(e), 10000, 'onEditFormatRules');      
+  } else if (sheetName === 'MF for NP') {
+    Logger.log('MF for NP Sheet is being edited');
+    timeoutFunction(() => insertNPListDate(e), 10000, 'insertNPListDate');
+    timeoutFunction(() => onEditVendingCheckbox(e), 10000, 'onEditVendingCheckbox');
+  } else if (sheetName === 'Requests') {
+    Logger.log('Requests Sheet is being edited');
+    timeoutFunction(() => onCheckMoveRow(e), 10000, 'onCheckMoveRow');
+  }
+}
+
+// General function to run all On Edit functions with a time-out of 10 seconds
+function onEdit(e) {
+  Logger.log("onEdit function triggered");
+  timeoutFunction(() => onEditSheetCheck(e), 10000);
+}
