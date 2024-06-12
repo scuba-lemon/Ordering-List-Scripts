@@ -1,0 +1,246 @@
+// Moves rows with checked boxes to the Transfers page
+function moveTransferRows() {
+  let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
+  let data = dataRange.getValues();
+  let orderingCheckboxColumnL = 12; // Column L (Checkbox from Ordering Sheet)
+  let orderingItemNameColumnE = 5; // Column E (Item Name from Ordering Sheet)
+  let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
+  let rowKeyIndex = getLastDataRowInColumn("A", transfersSheet);
+  let rowKeyLocation = transfersSheet.getRange(rowKeyIndex, 1, 1, 1);
+  let rowKeyValue = rowKeyLocation.getValue();
+  if (rowKeyValue == '' || rowKeyValue == null || rowKeyValue == "#") {
+        rowKeyValue = 0;
+      }
+
+  // Prompt the user for Employee Initials or Name
+  let employee = Browser.inputBox('Enter Employee Initials or Name');
+
+  // Iterate through each row in reverse order
+  for (let i = data.length - 1; i >= 0; i--) {
+    let orderingCheckboxValueL = data[i][orderingCheckboxColumnL - 1]; // Adjust the index for JavaScript's 0-based indexing
+
+    // Check if the checkbox is checked in column L
+    if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
+      rowKeyValue++;
+      let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
+      // Prompt the user for additional information
+      let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
+
+      // Move the values to the "Transfers" sheet with additional information
+      transfersSheet.appendRow([rowKeyValue, ...data[i].slice(0, 8), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
+      
+      // Select the cell in column L of the current row on the "Transfers" sheet and add a checkbox for the "Received" Column
+      let transferredRow = transfersSheet.getLastRow();
+      let checkboxCell = transfersSheet.getRange(transferredRow, 13);
+      checkboxCell.setDataValidation(checkBox);
+    }
+
+    // If checkbox is checked, delete the row from the source sheet
+    if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
+      orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
+    }
+  }
+  // Add a thick black border to the bottom of the final row
+  let lastRow = transfersSheet.getLastRow();
+  let lastColumn = transfersSheet.getLastColumn();
+  let lastRowRange = transfersSheet.getRange(lastRow, 1, 1, lastColumn);
+  lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+}
+
+// Moves rows with checked boxes to the Complete page
+function moveCompleteRows() {
+  let sName = activeSheet.getSheetName();
+  let rowKeyIndex = getLastDataRowInColumn("A", completeSheet);
+  let rowKeyLocation = completeSheet.getRange(rowKeyIndex, 1, 1, 1);
+  let rowKeyValue = rowKeyLocation.getValue();
+  if (rowKeyValue == '' || rowKeyValue == null || rowKeyValue == "#") { rowKeyValue = 0; }
+
+  if (sName == "Ordering List") {
+    let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
+    let orderingCheckboxColumnO = 15; // Column O (Checkbox from Ordering Sheet)
+    let orderingItemNameColumnE = 5; // Column E (Item Name from Ordering Sheet)
+
+    let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
+    let data = dataRange.getValues();
+
+    // Prompt the user for Employee Initials or Name
+    let employee = Browser.inputBox('Enter Employee Initials or Name');
+
+    // Iterate through each row
+    for (let i = data.length - 1; i >= 0; i--) {
+      let orderingCheckboxValueO = data[i][orderingCheckboxColumnO - 1]; // Adjust the index for JavaScript's 0-based indexing
+
+      // Check if the checkbox is checked in column O
+      if (orderingCheckboxValueO === true || orderingCheckboxValueO === 'TRUE') {
+        rowKeyValue++;
+        let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
+        // Prompt the user for additional information
+        let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
+
+        // Move the values to the "Complete" sheet with additional information
+        completeSheet.appendRow([rowKeyValue, ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
+        let newRow = completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn());
+        newRow.setBackground(completeColor);
+      }
+
+      // If either checkbox is checked, delete the row from the source sheet
+      if (orderingCheckboxValueO === true || orderingCheckboxValueO === 'TRUE') {
+        orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
+      }
+    }   
+
+    // Add a thick black border to the bottom of the final row
+    let lastRow = completeSheet.getLastRow();
+    let lastColumn = completeSheet.getLastColumn();
+    let lastRowRange = completeSheet.getRange(lastRow, 1, 1, lastColumn);
+    lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  
+  } else if (sName == "Transfers") {
+    let transferQuantityColumnK = 11; // Column K (Quantity from Transfers Sheet)
+    let transferSendingEmpColumnL = 12; // Column K (Quantity from Transfers Sheet)
+    let transferCheckboxColumnM = 13; // Column M (Checkbox from Transfers Sheet)
+    let transferNotesColumnN = 14; // Column O (Notes from Transfers Sheet)
+    
+    
+    let dataRange = transfersSheet.getRange(2, 1, transfersSheet.getLastRow() - 1, transfersSheet.getLastColumn());
+    let data = dataRange.getValues();
+
+    // Prompt the user for Employee Initials or Name
+    let employee = Browser.inputBox('Enter Employee Initials or Name');
+
+    // Iterate through each row
+    for (let i = data.length - 1; i >= 0; i--) {
+      let transferCheckboxValueM = data[i][transferCheckboxColumnM - 1]; // Adjust the index for JavaScript's 0-based indexing
+
+      // Check if the checkbox is checked in column M
+      if (transferCheckboxValueM === true || transferCheckboxValueM === 'TRUE') {
+        rowKeyValue++;
+
+        // Move the values to the "Complete" sheet with additional information
+        completeSheet.appendRow([rowKeyValue, ...data[i].slice(1, 10), formattedDate, data[i][transferQuantityColumnK - 1], employee, data[i][transferSendingEmpColumnL - 1], data[i][transferNotesColumnN - 1], "T"]);
+        let newRow = completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn());
+        newRow.setBackground(transferColor);
+      }
+
+      // If either checkbox is checked, delete the row from the source sheet
+      if (transferCheckboxValueM === true || transferCheckboxValueM === 'TRUE') {
+        transfersSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
+      }
+    }
+
+    // Add a thick black border to the bottom of the final row
+    let lastRow = completeSheet.getLastRow();
+    let lastColumn = completeSheet.getLastColumn();
+    let lastRowRange = completeSheet.getRange(lastRow, 1, 1, lastColumn);
+    lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  
+  } else { 
+    console.log("Sheet name: " + sName)
+    return; 
+  };
+
+}
+
+// Moves rows with checked boxes to the Nomo page
+function moveNomoRows() {
+  let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
+  let data = dataRange.getValues();
+  let orderingCheckboxColumnM = 13; // Column M (Checkbox from Ordering Sheet)
+  let rowKeyIndex = getLastDataRowInColumn("A", nomoSheet);
+  let rowKeyLocation = nomoSheet.getRange(rowKeyIndex, 1, 1, 1);
+  let rowKeyValue = rowKeyLocation.getValue();
+  if (rowKeyValue == '' || rowKeyValue == null || rowKeyValue == "#") {
+        rowKeyValue = 0;
+  }
+
+  // Iterate through each row
+  for (let i = data.length - 1; i >= 0; i--) {
+    let orderingCheckboxValueM = data[i][orderingCheckboxColumnM - 1]; // Adjust the index for JavaScript's 0-based indexing
+
+    // Check if the checkbox is checked in column M
+    if (orderingCheckboxValueM === true || orderingCheckboxValueM === 'TRUE') {
+      rowKeyValue++;
+      // Move the values in columns A-E to the "Transfers" sheet
+      nomoSheet.appendRow([rowKeyValue, ...data[i].slice(0, 5), data[i][data[i].length - 1]]);
+    }
+
+    // If checkbox is checked, delete the row from the source sheet
+    if (orderingCheckboxValueM === true || orderingCheckboxValueM === 'TRUE') {
+      orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
+    }
+  }
+} 
+
+// Sorts the data alphabetically
+function alphabeticalSort() {
+  let sName = activeSheet.getSheetName();
+  let range;
+
+  if (sName == "Notes" || sName == "MF for NP") {
+    Logger.log("Alphabetizing attempt on invalid sheet.");
+    return;
+  } else {
+    // Check if there are any existing filters on the sheet & add a filter to the sheet
+    if (activeSheet.getFilter()) { 
+        activeSheet.getFilter().remove(); 
+        activeSheet.getDataRange().createFilter();
+      } else {
+        activeSheet.getDataRange().createFilter();
+      }
+    
+    // Define the range based on sheet name
+    if (sName == "Ordering List") {
+      Logger.log("Alphabetizing the Ordering List Sheet");
+      let lastRow = getLastDataRowInColumn("A", activeSheet);
+      range = orderSheet.getRange(2, 1, lastRow, orderSheet.getLastColumn());
+      range.sort([{column: 2, ascending: true}, {column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}]);
+    } else if (sName == "Transfers" || sName == "Complete" || sName == 'Nomo') {
+      let lastRow = getLastDataRowInColumn("A", activeSheet);
+      Logger.log("Alphabetizing the Transfers, Complete, or Nomo Sheet");
+      range = activeSheet.getRange(2, 1, lastRow, activeSheet.getLastColumn());
+      range.sort([{column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}, {column: 6, ascending: true}]);
+    } else if (sName == "Drop Downs") {
+      let lastRow = getLastDataRowInColumn("D", activeSheet);
+      Logger.log("Alphabetizing the Drop Downs Sheet");
+      range = activeSheet.getRange(2, 1, lastRow, activeSheet.getLastColumn());
+      for (let col = 1; col <= activeSheet.getLastColumn(); col++) {
+        range.sort({column: col, ascending: true});
+      }
+    } else if (sName == "Devices") {
+      let lastRow = getLastDataRowInColumn("M", activeSheet);
+      Logger.log("Alphabetizing the Devices Sheet");
+      range = activeSheet.getRange(2, 1, lastRow, activeSheet.getLastColumn());
+      for (let col = 1; col <= activeSheet.getLastColumn(); col++) {
+        range.sort({column: col, ascending: true});
+      }
+    } else if (sName == "Requests") {
+      let lastRow = getLastDataRowInColumn("A", activeSheet);
+      Logger.log("Alphabetizing the Requests Sheet");
+      range = activeSheet.getRange(2, 1, lastRow, activeSheet.getLastColumn());
+      for (let col = 1; col <= activeSheet.getLastColumn(); col++) {
+        range.sort([{column: 5, ascending: true}, {column: 6, ascending: true}, {column: 7, ascending: true}, {column: 8, ascending: true}]);
+      }
+    } else if (sName == "Rejected Requests") {
+      let lastRow = getLastDataRowInColumn("A", activeSheet);
+      Logger.log("Alphabetizing the Rejects Sheet");
+      range = activeSheet.getRange(2, 1, lastRow, activeSheet.getLastColumn());
+      for (let col = 1; col <= activeSheet.getLastColumn(); col++) {
+        range.sort([{column: 2, ascending: true}, {column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}]);
+      }
+    }
+  }
+}
+
+// Creates the custom menu option to run the custom functions
+function onOpen() {
+  oldOrderingEntries();
+  let ui = SpreadsheetApp.getUi();
+  ui.createMenu('Custom Menu')
+    .addItem('Alphabetical Sort', 'alphabeticalSort')
+    .addItem('Move Transfers', 'moveTransferRows')
+    //.addItem('Move MF for NP Vending Transfers', 'moveVendingTransfers') | WORK IN PROGRESS
+    .addItem('Move Nomo Rows', 'moveNomoRows')
+    .addItem('Move Completed Rows', 'moveCompleteRows')
+    .addItem('Show Older Ordering List Dates', 'oldOrderingEntries')
+    .addToUi();
+}
