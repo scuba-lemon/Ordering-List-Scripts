@@ -1,9 +1,4 @@
-# ordering-list-scripts
-Custom functions and code created to improve a spreadsheet that is used for tracking and managing inventory.
------
-Created by Makaela Wesner
------
-
+/*
 -------------------------------------------------
 Function File Locations
 -----
@@ -29,6 +24,8 @@ Helper Functions:
   - compareDates(valueInColumnI, row)
   - oldOrderingEntries()
   - parseDate(dateStr)
+  - checkCheckboxesInRow(row)
+  - highlightCheckForBoxes(checkedColumn)
 
 On Edit Functions:
   - onEditVendingCheckbox(e)
@@ -124,6 +121,12 @@ Changelog
 6/12/24
 - Added the insertNPListDate function to automatically populate the list date when liquid is added to MF for NP
 
+-----
+6/15/24
+- Created the 
+- Modified the onEditFormatRules to include the new helper functions to correct the old order date highlighting rules
+- Added the checkCheckboxesInRow and highlightCheckForBoxes functions to correct the old ordering dates highlighting
+
 -------------------------------------------------
 Known Bugs
 -----
@@ -144,10 +147,6 @@ Known Bugs
 6/10/24
 - The bordering for old ordering dates has some kind of issue with the alphabetical sort. No idea why, but cells are being bordered when they either aren't old enough to trigger the border, or the cell is empty. 
 
------
-6/12/24
-- Tried modifying the old ordering dates function to highlight intead of border, and it didn't want to do anything when I was working on it. 
-
 -------------------------------------------------
 Planned/Suggested Features
 -----
@@ -160,3 +159,4 @@ Planned/Suggested Features
 - Add the auto-date filling from the Requests transferring code to the code for moving Transfers and Complete rows, so there's one fewer fields to fill in. 
 
 -------------------------------------------------
+*/
