@@ -370,10 +370,11 @@ function highlightDupicateNomos(originalRowIndex, duplicateRowIndex) {
   Logger.log("Duplicate row highlighted: " + duplicateRowIndex);
 }
 
-// Compares the order date to today's date, and if the date is older than 14 days, the cells will be lined with a thick black border
+// Compares the order date to today's date, and if the date is older than 14 days, the cells will be highlighted
 function compareDates(valueInColumnI, row) {
   let parsedDate = parseDate(valueInColumnI);
-        
+  let checkedColumn = checkCheckboxesInRow(row);
+
   if (parsedDate) {
     // Compare the parsed date to today's date
     let timeDifference = today - parsedDate;
@@ -381,17 +382,20 @@ function compareDates(valueInColumnI, row) {
 
     // Check if the date is older than 14 days
     if (dayDifference > 14) {
-      Logger.log("Row " + (row) + ", Column I: " + valueInColumnI + " is older than 14 days.");
+      Logger.log("Row " + row + ", Column I: " + valueInColumnI + " is older than 14 days.");
       // Highlight the list date and order date cells
       orderSheet.getRange(row, 8, 1, 2).setBackground(oldColor); // Change the background color as needed
     } else {
-      // Remove the highlighting
-      orderSheet.getRange(row, 8, 1, 2).setBackground(null);
+      if (checkedColumn != -1) {
+        highlightCheckForBoxes(checkedColumn, row);
+      } else {
+        // Remove the highlighting
+        orderSheet.getRange(row, 8, 1, orderSheet.getLastColumn()).setBackground(null);
+      }
     }
   } else {
-    // Remove the highlighting
-    orderSheet.getRange(row, 8, 1, 2).setBackground(null);
-    Logger.log("Row " + (row) + ", Column I: " + valueInColumnI + " could not be parsed.");
+    highlightCheckForBoxes(checkedColumn, row);
+    Logger.log("Row " + row + ", Column I: " + valueInColumnI + " could not be parsed.");
   }
 }
 
@@ -440,4 +444,41 @@ function parseDate(dateStr) {
     return null;
   }
   return date;
+}
+
+// Function to check if any checkboxes in columns J, L, M, N, and O are checked for a given row
+// and return the column number of the first checked checkbox
+function checkCheckboxesInRow(row) {
+  let columnsToCheck = [10, 12, 13, 14, 15]; // Columns J, L, M, N, O
+  for (let i = 0; i < columnsToCheck.length; i++) {
+    let col = columnsToCheck[i];
+    let cell = orderSheet.getRange(row, col);
+    let value = cell.getValue();
+    
+    // Check if the checkbox is checked
+    if (value === true || value === 'TRUE') {
+      return col; // Return the column number of the first checked checkbox
+    }
+  }
+  return -1; // No checkboxes are checked
+}
+
+// Function to highlight based on checked column
+function highlightCheckForBoxes(checkedColumn, row) {
+  if (checkedColumn == 10) {  // If the "New" checkbox is checked, highlights the row
+    Logger.log('New check triggered');
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor); // Change the background color as needed
+  } else if (checkedColumn == 12) {  // If the "Transfer" checkbox is checked, highlights the row
+    Logger.log('Transfer check triggered');
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor); // Change the background color as needed
+  } else if (checkedColumn == 13) {  // If the "Nomo" checkbox is checked, highlights the row
+    Logger.log('Nomo check triggered');
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor); // Change the background color as needed
+  } else if (checkedColumn == 14) {  // If the "Req" checkbox is checked, highlights the row
+    Logger.log('Req check triggered');
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(reqColor); // Change the background color as needed
+  } else if (checkedColumn == 15) {  // If the "Complete" checkbox is checked, highlights the row
+    Logger.log('Complete check triggered');
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor); // Change the background color as needed
+  }
 }
