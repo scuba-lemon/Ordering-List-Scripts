@@ -3,8 +3,8 @@ function onEditVendingCheckbox(e) {
   let editedRange = e.range;
   let editedRow = editedRange.getRow();
 
-  // Check if the edited cell is within the target range and in column G
-  let isIntersecting = editedRange.getColumn() == 7  // Column G
+  // Check if the edited cell is within the target range and in column H
+  let isIntersecting = editedRange.getColumn() == 8  // Column H
 
   if (isIntersecting) {
     Logger.log("onEditVendingCheckbox function triggered")
@@ -14,7 +14,7 @@ function onEditVendingCheckbox(e) {
     }
 
     // Gets the location of the cell in column K
-    let transferBoxTarget = mfForNpSheet.getRange(editedRow, 11);
+    let transferBoxTarget = mfForNpSheet.getRange(editedRow, 12);
 
     // Applies the checkboxes to the target cells in the appropriate columns
     transferBoxTarget.setDataValidation(checkBox);
@@ -248,9 +248,9 @@ function onEditFormatRules(e) {
     }  else {
       Logger.log("Order date cleared - removing strikethrough for the row")
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setFontLine(null);
-      // orderSheet.getRange(row, 8, 1, 2).setBorder(false, false, false, false, false, false); // Remove any border around the outside of cells in columns A-I of the current row
       Logger.log("Order date cleared - removing the highlighting.")
-      orderSheet.getRange(row, 8, 1, 2).setBackground(null); // Remove the highlighting
+      let checkedColumn = checkCheckboxesInRow(row);
+      highlightCheckForBoxes(checkedColumn, row);
     }
 
   } else if (column == 10) {  // If the "New" checkbox is checked, highlights the row
