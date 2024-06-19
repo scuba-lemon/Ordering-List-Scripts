@@ -123,9 +123,12 @@ Changelog
 
 -----
 6/15/24
-- Created the 
 - Modified the onEditFormatRules to include the new helper functions to correct the old order date highlighting rules
-- Added the checkCheckboxesInRow and highlightCheckForBoxes functions to correct the old ordering dates highlighting
+- Added the checkCheckboxesInRow and highlightCheckForBoxes functions to correct the old order date highlighting rules
+
+-----
+6/19/24
+- Removed all index number logic and code from the custom menu and archiving functions, so that the transfers, complete, nomo, and archive won't include an index number column. 
 
 -------------------------------------------------
 Known Bugs
@@ -135,9 +138,6 @@ Known Bugs
 - Squashed 3/14/24 - Alphabetical sort function revised to use array within .sort() method on the ordering list, transfers, nomo, and complete sheets, instead of a for loop sorting each column individually. 
 - The revised Alphabetical Sort function doesn't seem to want to alphabetize the drop downs sheet - still working on a fix, probably will need to change the for loop into an array like the other sheets.
 
------
-3/18/24
-- The assignment of index numbers in column A on transfers, nomo, and complete sheets need to be turned into a function & corrected to ensure the numbers are sequential. Currently the newest entry is not necessarily going to be assigned the correct next index number. 
 
 -----
 5/9/24
