@@ -5,12 +5,6 @@ function moveTransferRows() {
   let orderingCheckboxColumnL = 12; // Column L (Checkbox from Ordering Sheet)
   let orderingItemNameColumnE = 5; // Column E (Item Name from Ordering Sheet)
   let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
-  let rowKeyIndex = getLastDataRowInColumn("A", transfersSheet);
-  let rowKeyLocation = transfersSheet.getRange(rowKeyIndex, 1, 1, 1);
-  let rowKeyValue = rowKeyLocation.getValue();
-  if (rowKeyValue == '' || rowKeyValue == null || rowKeyValue == "#") {
-        rowKeyValue = 0;
-      }
 
   // Prompt the user for Employee Initials or Name
   let employee = Browser.inputBox('Enter Employee Initials or Name');
@@ -21,17 +15,16 @@ function moveTransferRows() {
 
     // Check if the checkbox is checked in column L
     if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
-      rowKeyValue++;
       let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
       // Prompt the user for additional information
       let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
 
       // Move the values to the "Transfers" sheet with additional information
-      transfersSheet.appendRow([rowKeyValue, ...data[i].slice(0, 8), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
+      transfersSheet.appendRow([...data[i].slice(0, 8), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
       
       // Select the cell in column L of the current row on the "Transfers" sheet and add a checkbox for the "Received" Column
       let transferredRow = transfersSheet.getLastRow();
-      let checkboxCell = transfersSheet.getRange(transferredRow, 13);
+      let checkboxCell = transfersSheet.getRange(transferredRow, 12);
       checkboxCell.setDataValidation(checkBox);
     }
 
@@ -50,11 +43,7 @@ function moveTransferRows() {
 // Moves rows with checked boxes to the Complete page
 function moveCompleteRows() {
   let sName = activeSheet.getSheetName();
-  let rowKeyIndex = getLastDataRowInColumn("A", completeSheet);
-  let rowKeyLocation = completeSheet.getRange(rowKeyIndex, 1, 1, 1);
-  let rowKeyValue = rowKeyLocation.getValue();
-  if (rowKeyValue == '' || rowKeyValue == null || rowKeyValue == "#") { rowKeyValue = 0; }
-
+  
   if (sName == "Ordering List") {
     let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
     let orderingCheckboxColumnO = 15; // Column O (Checkbox from Ordering Sheet)
@@ -72,15 +61,13 @@ function moveCompleteRows() {
 
       // Check if the checkbox is checked in column O
       if (orderingCheckboxValueO === true || orderingCheckboxValueO === 'TRUE') {
-        rowKeyValue++;
         let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
         // Prompt the user for additional information
         let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
 
         // Move the values to the "Complete" sheet with additional information
-        completeSheet.appendRow([rowKeyValue, ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
-        let newRow = completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn());
-        newRow.setBackground(completeColor);
+        completeSheet.appendRow([...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
+        completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(completeColor);
       }
 
       // If either checkbox is checked, delete the row from the source sheet
@@ -100,8 +87,6 @@ function moveCompleteRows() {
     let transferSendingEmpColumnL = 12; // Column K (Quantity from Transfers Sheet)
     let transferCheckboxColumnM = 13; // Column M (Checkbox from Transfers Sheet)
     let transferNotesColumnN = 14; // Column O (Notes from Transfers Sheet)
-    
-    
     let dataRange = transfersSheet.getRange(2, 1, transfersSheet.getLastRow() - 1, transfersSheet.getLastColumn());
     let data = dataRange.getValues();
 
@@ -114,12 +99,10 @@ function moveCompleteRows() {
 
       // Check if the checkbox is checked in column M
       if (transferCheckboxValueM === true || transferCheckboxValueM === 'TRUE') {
-        rowKeyValue++;
-
+        
         // Move the values to the "Complete" sheet with additional information
-        completeSheet.appendRow([rowKeyValue, ...data[i].slice(1, 10), formattedDate, data[i][transferQuantityColumnK - 1], employee, data[i][transferSendingEmpColumnL - 1], data[i][transferNotesColumnN - 1], "T"]);
-        let newRow = completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn());
-        newRow.setBackground(transferColor);
+        completeSheet.appendRow([...data[i].slice(1, 10), formattedDate, data[i][transferQuantityColumnK - 1], employee, data[i][transferSendingEmpColumnL - 1], data[i][transferNotesColumnN - 1], "T"]);
+        completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(transferColor);
       }
 
       // If either checkbox is checked, delete the row from the source sheet
@@ -146,22 +129,15 @@ function moveNomoRows() {
   let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
   let data = dataRange.getValues();
   let orderingCheckboxColumnM = 13; // Column M (Checkbox from Ordering Sheet)
-  let rowKeyIndex = getLastDataRowInColumn("A", nomoSheet);
-  let rowKeyLocation = nomoSheet.getRange(rowKeyIndex, 1, 1, 1);
-  let rowKeyValue = rowKeyLocation.getValue();
-  if (rowKeyValue == '' || rowKeyValue == null || rowKeyValue == "#") {
-        rowKeyValue = 0;
-  }
-
+  
   // Iterate through each row
   for (let i = data.length - 1; i >= 0; i--) {
     let orderingCheckboxValueM = data[i][orderingCheckboxColumnM - 1]; // Adjust the index for JavaScript's 0-based indexing
 
     // Check if the checkbox is checked in column M
     if (orderingCheckboxValueM === true || orderingCheckboxValueM === 'TRUE') {
-      rowKeyValue++;
       // Move the values in columns A-E to the "Transfers" sheet
-      nomoSheet.appendRow([rowKeyValue, ...data[i].slice(0, 5), data[i][data[i].length - 1]]);
+      nomoSheet.appendRow([...data[i].slice(0, 5), data[i][data[i].length - 1]]);
     }
 
     // If checkbox is checked, delete the row from the source sheet
@@ -233,7 +209,6 @@ function alphabeticalSort() {
 
 // Creates the custom menu option to run the custom functions
 function onOpen() {
-  oldOrderingEntries();
   let ui = SpreadsheetApp.getUi();
   ui.createMenu('Custom Menu')
     .addItem('Alphabetical Sort', 'alphabeticalSort')
