@@ -83,13 +83,12 @@ function moveCompleteRows() {
     lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   
   } else if (sName == "Transfers") {
-    let transferQuantityColumnK = 11; // Column K (Quantity from Transfers Sheet)
-    let transferSendingEmpColumnL = 12; // Column K (Quantity from Transfers Sheet)
-    let transferCheckboxColumnM = 13; // Column M (Checkbox from Transfers Sheet)
-    let transferNotesColumnN = 14; // Column O (Notes from Transfers Sheet)
+    let transferQuantityColumnK = 10; // Column J (Quantity from Transfers Sheet)
+    let transferSendingEmpColumnL = 11; // Column K (Quantity from Transfers Sheet)
+    let transferCheckboxColumnM = 12; // Column L (Checkbox from Transfers Sheet)
+    let transferNotesColumnN = 13; // Column M (Notes from Transfers Sheet)
     let dataRange = transfersSheet.getRange(2, 1, transfersSheet.getLastRow() - 1, transfersSheet.getLastColumn());
     let data = dataRange.getValues();
-
     // Prompt the user for Employee Initials or Name
     let employee = Browser.inputBox('Enter Employee Initials or Name');
 
@@ -101,7 +100,7 @@ function moveCompleteRows() {
       if (transferCheckboxValueM === true || transferCheckboxValueM === 'TRUE') {
         
         // Move the values to the "Complete" sheet with additional information
-        completeSheet.appendRow([...data[i].slice(1, 10), formattedDate, data[i][transferQuantityColumnK - 1], employee, data[i][transferSendingEmpColumnL - 1], data[i][transferNotesColumnN - 1], "T"]);
+        completeSheet.appendRow([...data[i].slice(0, 9), formattedDate, data[i][transferQuantityColumnK - 1], employee, data[i][transferSendingEmpColumnL - 1], data[i][transferNotesColumnN - 1], "T"]);
         completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(transferColor);
       }
 
