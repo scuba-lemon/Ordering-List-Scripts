@@ -133,19 +133,7 @@ Changelog
 -------------------------------------------------
 Known Bugs
 -----
-3/14/24
-- Alphabetical Sort function is not keeping rows intact when sorting - columns B-E look right, but the rows in the rest of the columns don't move. 
-- Squashed 3/14/24 - Alphabetical sort function revised to use array within .sort() method on the ordering list, transfers, nomo, and complete sheets, instead of a for loop sorting each column individually. 
-- The revised Alphabetical Sort function doesn't seem to want to alphabetize the drop downs sheet - still working on a fix, probably will need to change the for loop into an array like the other sheets.
 
-
------
-5/9/24
-- If too many rows are checked too quickly on the Requests sheet, the wrong rows may be moved. Hopefully should be caught by a try/catch statement, but there could still be bugs due to asynchronous functions - as far as I know that cannot really be avoided in Google Sheets Scripts, but I may do some more research on it in the future. In the meantime as long as the checkboxes are clicked at a reasonable speed it shouldn't be a problem.
-
------
-6/10/24
-- The bordering for old ordering dates has some kind of issue with the alphabetical sort. No idea why, but cells are being bordered when they either aren't old enough to trigger the border, or the cell is empty. 
 
 -------------------------------------------------
 Planned/Suggested Features
