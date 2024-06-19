@@ -15,7 +15,7 @@ function moveAndClearCompleteSheet() {
   destinationSheet = destinationSpreadsheet.insertSheet(dateOnly);
   
   // Insert a row for column headers before appending the data
-  let columnHeaders = ["Index", "L", "Category", "Brand", "SubCat", "Item", "Stock", "Sold L.M.", "List Date", "Order/Transfer Date", "Arrival Date", "Quantity", "Employee (Receiving)", "Employee (Sending)", "Notes", "T/O"];
+  let columnHeaders = ["L", "Category", "Brand", "SubCat", "Item", "Stock", "Sold L.M.", "List Date", "Order/Transfer Date", "Arrival Date", "Quantity", "Employee (Receiving)", "Employee (Sending)", "Notes", "T/O"];
   destinationSheet.getRange(1, 1, 1, columnHeaders.length).setValues([columnHeaders]);
 
   // Apply formatting to column headers
