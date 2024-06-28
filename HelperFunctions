@@ -401,23 +401,19 @@ function compareDates(valueInColumnI, row) {
 
 // Runs on open to check for old ordering dates
 function oldOrderingEntries() {
-  let lastRow = getLastDataRowInColumn("A", orderSheet);
   // Get all the data in the sheet
   let data = orderSheet.getDataRange().getValues();
+  let lastRow = getLastDataRowInColumn("A", orderSheet) + 1;
+  console.log("Last Row: " + lastRow);
 
-  for (let row = 2; row <= lastRow; row++) { // Start from row 2 to skip the header
-    let checkedColumn = checkCheckboxesInRow(row);
-    if (checkedColumn != -1) {
-      // Iterate over each row, starting from the second row to skip the header
-      for (let i = 1; i < data.length; i++) {
-      let valueInColumnI = data[i][8]; // Column I is the 9th column (0-indexed)
-    
-      // Check if the value in column I is not empty
-      if (valueInColumnI !== '') {
-        let row = i + 1;
-        compareDates(valueInColumnI, row);
-        }
-      }
+  // Iterate over each row, starting from the second row to skip the header
+  for (let i = 1; i < data.length; i++) {
+    let valueInColumnI = data[i][8]; // Column I is the 9th column (0-indexed)
+    let row = i + 1;    
+    if(row == lastRow) {break};
+    // Check if the value in column I is not empty
+    if (valueInColumnI !== '') {
+      compareDates(valueInColumnI, row); 
     }
   }
 } 
