@@ -137,5 +137,6 @@ Changelog
 -----
 7/29/24
 - Updated the alphabeticalSort and onCheckMoveRow (for reqs/rejs) functions to resolve a sorting error by appending an empty row before sorting
+- Removed checkboxes on the ordering list for transfers and complete columns - replaced with quantities which are automatically appended when the function runs
 
 */
