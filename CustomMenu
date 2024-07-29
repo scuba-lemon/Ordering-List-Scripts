@@ -1,24 +1,22 @@
-// Moves rows with checked boxes to the Transfers page
+// Moves rows to the Transfers page
 function moveTransferRows() {
   let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
   let data = dataRange.getValues();
-  let orderingCheckboxColumnL = 12; // Column L (Checkbox from Ordering Sheet)
-  let orderingItemNameColumnE = 5; // Column E (Item Name from Ordering Sheet)
+  let orderingQuantityColumnL = 12; // Column L (Cell from Ordering Sheet)
   let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
 
-  // Prompt the user for Employee Initials or Name
-  let employee = Browser.inputBox('Enter Employee Initials or Name');
+  // Prompt the user for Employee Initials
+  let employee = Browser.inputBox('Enter Employee Initials');
 
   // Iterate through each row in reverse order
   for (let i = data.length - 1; i >= 0; i--) {
-    let orderingCheckboxValueL = data[i][orderingCheckboxColumnL - 1]; // Adjust the index for JavaScript's 0-based indexing
+    let orderingQuantityValueL = data[i][orderingQuantityColumnL - 1]; // Adjust the index for JavaScript's 0-based indexing
 
-    // Check if the checkbox is checked in column L
-    if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
+    // Check if the cell contains a value in column L
+    if (orderingQuantityValueL !== "") {
       Logger.log("Found transfer on row #" + i);
-      let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
-      // Prompt the user for additional information
-      let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
+      // Save the quantity for the item
+      let quantity = orderingQuantityValueL;
 
       // Move the values to the "Transfers" sheet with additional information
       Logger.log("Appending row to Transfers Sheet");
@@ -29,54 +27,46 @@ function moveTransferRows() {
       let checkboxCell = transfersSheet.getRange(transferredRow, 12);
       checkboxCell.setDataValidation(checkBox);
       
-      // If checkbox is checked, delete the row from the source sheet
+      // Delete the row from the source sheet
       orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
     }
-    
-  //   if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
-  //     orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
-  //   }
-  
   }
+
   // Add a thick black border to the bottom of the final row
   let lastRow = transfersSheet.getLastRow();
   let lastColumn = transfersSheet.getLastColumn();
   let lastRowRange = transfersSheet.getRange(lastRow, 1, 1, lastColumn);
   lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+
 }
 
-// Moves rows with checked boxes to the Complete page
+// Moves rows to the Complete page
 function moveCompleteRows() {
   let sName = activeSheet.getSheetName();
   
   if (sName == "Ordering List") {
     let orderingNotesColumnP = 16; // Column P (Notes from Ordering Sheet)
-    let orderingCheckboxColumnO = 15; // Column O (Checkbox from Ordering Sheet)
-    let orderingItemNameColumnE = 5; // Column E (Item Name from Ordering Sheet)
-
+    let orderingQuantityColumnO = 15; // Column O (Cell from Ordering Sheet)
     let dataRange = orderSheet.getRange(2, 1, orderSheet.getLastRow() - 1, orderSheet.getLastColumn());
     let data = dataRange.getValues();
 
-    // Prompt the user for Employee Initials or Name
-    let employee = Browser.inputBox('Enter Employee Initials or Name');
+    // Prompt the user for Employee Initials
+    let employee = Browser.inputBox('Enter Employee Initials');
 
     // Iterate through each row
     for (let i = data.length - 1; i >= 0; i--) {
-      let orderingCheckboxValueO = data[i][orderingCheckboxColumnO - 1]; // Adjust the index for JavaScript's 0-based indexing
+      let orderingQuantityValueO = data[i][orderingQuantityColumnO - 1]; // Adjust the index for JavaScript's 0-based indexing
 
-      // Check if the checkbox is checked in column O
-      if (orderingCheckboxValueO === true || orderingCheckboxValueO === 'TRUE') {
-        let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
-        // Prompt the user for additional information
-        let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
+      // Check if the cell contains a value in column O
+      if (orderingQuantityValueO !== "") {
+        // Save the quantity for the item
+        let quantity = orderingQuantityValueO;
 
         // Move the values to the "Complete" sheet with additional information
         completeSheet.appendRow([...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
         completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(completeColor);
-      }
 
-      // If either checkbox is checked, delete the row from the source sheet
-      if (orderingCheckboxValueO === true || orderingCheckboxValueO === 'TRUE') {
+        // Delete the row from the source sheet
         orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
       }
     }   
@@ -94,8 +84,8 @@ function moveCompleteRows() {
     let transferNotesColumnM = 13; // Column M (Notes from Transfers Sheet)
     let dataRange = transfersSheet.getRange(2, 1, transfersSheet.getLastRow() - 1, transfersSheet.getLastColumn());
     let data = dataRange.getValues();
-    // Prompt the user for Employee Initials or Name
-    let employee = Browser.inputBox('Enter Employee Initials or Name');
+    // Prompt the user for Employee Initials
+    let employee = Browser.inputBox('Enter Employee Initials');
 
     // Iterate through each row
     for (let i = data.length - 1; i >= 0; i--) {
@@ -107,10 +97,8 @@ function moveCompleteRows() {
         // Move the values to the "Complete" sheet with additional information
         completeSheet.appendRow([...data[i].slice(0, 9), formattedDate, data[i][transferQuantityColumnJ - 1], employee, data[i][transferSendingEmpColumnK - 1], data[i][transferNotesColumnM - 1], "T"]);
         completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(transferColor);
-      }
 
-      // If either checkbox is checked, delete the row from the source sheet
-      if (transferCheckboxValueM === true || transferCheckboxValueM === 'TRUE') {
+        // Delete the row from the source sheet
         transfersSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
       }
     }
