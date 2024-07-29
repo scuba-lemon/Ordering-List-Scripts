@@ -50,17 +50,13 @@ function createCheckBoxes(currentRow) {
   
   // Gets the location of the cells in columns J, L, M, N, and O
   let newTargetCell = orderSheet.getRange('J' + currentRow.toString()); // Column J
-  let transferTargetCell = orderSheet.getRange('L' + currentRow.toString()); // Column L
   let nomoTargetCell = orderSheet.getRange('M' + currentRow.toString()); // Column M
   let reqTargetCell = orderSheet.getRange('N' + currentRow.toString()); // Colmun N
-  let completeTargetCell = orderSheet.getRange('O' + currentRow.toString()); // Column O
 
   // Applies the checkboxes to the target cells in the appropriate columns
   newTargetCell.setDataValidation(checkBox);
-  transferTargetCell.setDataValidation(checkBox);
   nomoTargetCell.setDataValidation(checkBox);
   reqTargetCell.setDataValidation(checkBox);
-  completeTargetCell.setDataValidation(checkBox);
 }
 
 // Assigns the correct brands for each category
@@ -404,7 +400,6 @@ function oldOrderingEntries() {
   // Get all the data in the sheet
   let data = orderSheet.getDataRange().getValues();
   let lastRow = getLastDataRowInColumn("A", orderSheet) + 1;
-  console.log("Last Row: " + lastRow);
 
   // Iterate over each row, starting from the second row to skip the header
   for (let i = 1; i < data.length; i++) {
