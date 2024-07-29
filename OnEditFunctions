@@ -254,40 +254,42 @@ function onEditFormatRules(e) {
     }
 
   } else if (column == 10) {  // If the "New" checkbox is checked, highlights the row
+    Logger.log('New check triggered')
     if (range.isChecked()) {
-      Logger.log('New check triggered')
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor); // Change the background color as needed
     } else {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
 
-  } else if (column == 12) {  // If the "Transfer" checkbox is checked, highlights the row
-    if (range.isChecked()) {
-      Logger.log('Transfer check triggered')
+  } else if (column == 12) {  // If the "Transfer" cell has a value, highlights the row
+    Logger.log('Transfer check triggered')
+    let valueL = orderSheet.getRange(row, 12).getValue(); // Value in column L
+    if (valueL !== "") {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor); // Change the background color as needed
     } else {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
 
   } else if (column == 13) {  // If the "Nomo" checkbox is checked, highlights the row
+    Logger.log('Nomo check triggered');
     if (range.isChecked()) {
-      Logger.log('Nomo check triggered');
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor); // Change the background color as needed
     } else {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
 
   } else if (column == 14) {  // If the "Req" checkbox is checked, highlights the row
+    Logger.log('Req check triggered');
     if (range.isChecked()) {
-      Logger.log('Req check triggered');
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(reqColor); // Change the background color as needed
     } else {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
     }
     
-  } else if (column == 15) {  // If the "Complete" checkbox is checked, highlights the row
-    if (range.isChecked()) {
-      Logger.log('Complete check triggered');
+  } else if (column == 15) {  // If the "Complete" cell has a value, highlights the row
+    Logger.log('Transfer check triggered');
+    let valueO = orderSheet.getRange(row, 15).getValue(); // Value in column O
+    if (valueO !== "") {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor); // Change the background color as needed
     } else {
       orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(null);
