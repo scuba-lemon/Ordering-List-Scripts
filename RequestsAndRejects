@@ -281,7 +281,7 @@ function onCheckMoveRow(e) {
         orderSheet.appendRow(emptyRow);
         let orderRange = orderSheet.getRange(2, 1, lastRow, orderSheet.getLastColumn());
         orderRange.sort([{column: 2, ascending: true}, {column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}]);
-
+        
         requestSheet.deleteRow(row);
         
       } else if (destinationSheetName === "Rejected Requests") {
