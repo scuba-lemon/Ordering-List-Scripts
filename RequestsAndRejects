@@ -193,9 +193,9 @@ function onCheckMoveRow(e) {
   
   try {
     Logger.log("onCheckMoveRow function triggered")
-    const range = e.range;
-    const row = range.getRow();
-    const col = range.getColumn();
+    let range = e.range;
+    let row = range.getRow();
+    let col = range.getColumn();
     let productName = "";
     let combinedNotes = "";
     
@@ -268,10 +268,20 @@ function onCheckMoveRow(e) {
           "",
           newListEntry.notes,
         ]);
-       // Add checkboxes to the new row, and sets the background color to indicate that the item is a request, and strikethrough to indicate that it has been ordered
+
+        // Add checkboxes to the new row, and sets the background color to indicate that the item is a request, and strikethrough to indicate that it has been ordered
         createCheckBoxes(orderSheet.getLastRow()); // Pass the current row to createCheckBoxes()
         orderSheet.getRange(orderSheet.getLastRow(), 1, 1, orderSheet.getLastColumn()).setBackground(reqColor)
         orderSheet.getRange(orderSheet.getLastRow(), 1, 1, 5).setFontLine("line-through");
+
+        // Adds an empty row to the end of the sheet (to fix range errors), then alphabetizes the ordering list
+        let lastRow = getLastDataRowInColumn("A", orderSheet);
+        let numColumns = orderSheet.getLastColumn();
+        let emptyRow = Array(numColumns).fill('');
+        orderSheet.appendRow(emptyRow);
+        let orderRange = orderSheet.getRange(2, 1, lastRow, orderSheet.getLastColumn());
+        orderRange.sort([{column: 2, ascending: true}, {column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}]);
+
         requestSheet.deleteRow(row);
         
       } else if (destinationSheetName === "Rejected Requests") {
