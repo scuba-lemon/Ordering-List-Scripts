@@ -15,23 +15,28 @@ function moveTransferRows() {
 
     // Check if the checkbox is checked in column L
     if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
+      Logger.log("Found transfer on row #" + i);
       let itemName = data[i][orderingItemNameColumnE - 1]; // Get the item name from column E
       // Prompt the user for additional information
       let quantity = Browser.inputBox('Enter Quantity for ' + itemName + ':');
 
       // Move the values to the "Transfers" sheet with additional information
+      Logger.log("Appending row to Transfers Sheet");
       transfersSheet.appendRow([...data[i].slice(0, 8), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
       
       // Select the cell in column L of the current row on the "Transfers" sheet and add a checkbox for the "Received" Column
       let transferredRow = transfersSheet.getLastRow();
       let checkboxCell = transfersSheet.getRange(transferredRow, 12);
       checkboxCell.setDataValidation(checkBox);
-    }
-
-    // If checkbox is checked, delete the row from the source sheet
-    if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
+      
+      // If checkbox is checked, delete the row from the source sheet
       orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
     }
+    
+  //   if (orderingCheckboxValueL === true || orderingCheckboxValueL === 'TRUE') {
+  //     orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
+  //   }
+  
   }
   // Add a thick black border to the bottom of the final row
   let lastRow = transfersSheet.getLastRow();
@@ -167,6 +172,9 @@ function alphabeticalSort() {
     if (sName == "Ordering List") {
       Logger.log("Alphabetizing the Ordering List Sheet");
       let lastRow = getLastDataRowInColumn("A", activeSheet);
+      let numColumns = orderSheet.getLastColumn();
+      let emptyRow = Array(numColumns).fill('');
+      orderSheet.appendRow(emptyRow);
       range = orderSheet.getRange(2, 1, lastRow, orderSheet.getLastColumn());
       range.sort([{column: 2, ascending: true}, {column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}]);
     } else if (sName == "Transfers" || sName == "Complete" || sName == 'Nomo') {
@@ -217,4 +225,5 @@ function onOpen() {
     .addItem('Move Completed Rows', 'moveCompleteRows')
     .addItem('Show Older Ordering List Dates', 'oldOrderingEntries')
     .addToUi();
+  oldOrderingEntries();
 }
