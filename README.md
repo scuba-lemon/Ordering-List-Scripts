@@ -134,21 +134,8 @@ Changelog
 6/28/24
 - Modified the oldOrderingEntries function to end the function when the loop reaches the last row. 
 
--------------------------------------------------
-Known Bugs
 -----
+7/29/24
+- Updated the alphabeticalSort and onCheckMoveRow (for reqs/rejs) functions to resolve a sorting error by appending an empty row before sorting
 
-
--------------------------------------------------
-Planned/Suggested Features
------
-3/18/24
-- Checkboxes on transfers, nomo, and complete sheets to send the row back to the ordering list, in case a row is added by mistake. 
-
------
-5/10/24
-- Collin suggested some kind of "list count" for the requests sheet if we have an item requested more than once. For now, I feel like the nomo/reject highlighting accomplishes the same goal, but I'll think about how that could be implemented in the future. 
-- Add the auto-date filling from the Requests transferring code to the code for moving Transfers and Complete rows, so there's one fewer fields to fill in. 
-
--------------------------------------------------
 */
