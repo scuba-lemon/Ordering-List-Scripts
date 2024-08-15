@@ -1,6 +1,7 @@
 // Gets the active spreadsheet and all sheets within the spreadsheet
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const orderSheet = ss.getSheetByName('Ordering List');
+  const mfForNpVendingSheet = ss.getSheetByName("MF for NP Vending");
   const mfForNpSheet = ss.getSheetByName("MF for NP");
   const requestSheet = ss.getSheetByName('Requests');
   const transfersSheet = ss.getSheetByName('Transfers');
