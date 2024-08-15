@@ -1,6 +1,6 @@
 /*
 -------------------------------------------------
-Function File Locations
+Functions Index
 -----
 
 Helper Functions:
@@ -19,8 +19,6 @@ Helper Functions:
   - checkForDuplicateRow(e, products)
   - highlightDuplicateRows(originalRowIndex, duplicateRowIndex)
   - highlightDupicateNomos(originalRowIndex, duplicateRowIndex)
-  - insertListDate(e)
-  - insertNPListDate(e)
   - compareDates(valueInColumnI, row)
   - oldOrderingEntries()
   - parseDate(dateStr)
@@ -34,6 +32,9 @@ On Edit Functions:
   - onEditUpdateDropdowns(e)
   - onEditUpdateDevices(e)
   - onEditFormatRules(e)
+  - insertListDate(e)
+  - insertNPListDate(e)
+  - onEditVendingFormat(e)
   - onEditSheetCheck(e)
   - onEdit(e)
 
@@ -136,7 +137,13 @@ Changelog
 
 -----
 7/29/24
-- Updated the alphabeticalSort and onCheckMoveRow (for reqs/rejs) functions to resolve a sorting error by appending an empty row before sorting
-- Removed checkboxes on the ordering list for transfers and complete columns - replaced with quantities which are automatically appended when the function runs
+- Updated the alphabeticalSort and onCheckMoveRow (for reqs/rejs) functions to resolve a sorting error by appending an empty row before sorting.
+- Removed checkboxes on the ordering list for transfers and complete columns - replaced with quantities which are automatically appended when the function runs.
+
+-----
+8/15/24
+- Changed the MF for NP sheet to a new format and seperated the NP Vending sheet from the MF for NP sheet until I have a better vending format worked out.
+- Modified the insertNPListDate(e), onEditVendingFormat(e), and onEditSheetCheck(e) functions to match the new sheets & streamlined the conditional statements for the NP sheets.
+- Updated the variables and constants and the function index/reference at the top of this document. 
 
 */
