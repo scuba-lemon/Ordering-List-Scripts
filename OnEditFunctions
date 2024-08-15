@@ -1,26 +1,3 @@
-// Insert checkboxes on the MF for NP page when a new row is added for Vending transfers
-function onEditVendingCheckbox(e) {
-  let editedRange = e.range;
-  let editedRow = editedRange.getRow();
-
-  // Check if the edited cell is within the target range and in column H
-  let isIntersecting = editedRange.getColumn() == 8  // Column H
-
-  if (isIntersecting) {
-    Logger.log("onEditVendingCheckbox function triggered")
-    // Ignore rows 1-3
-    if (editedRow < 3) {
-      return;
-    }
-
-    // Gets the location of the cell in column K
-    let transferBoxTarget = mfForNpSheet.getRange(editedRow, 12);
-
-    // Applies the checkboxes to the target cells in the appropriate columns
-    transferBoxTarget.setDataValidation(checkBox);
-  }
-}
-
 // Generates drop-down menus and inserts checkboxes if the cell containing the category is edited on the Ordering List sheet
 function onEditTriggerDropDown(e) {
   // Check if the edit occurred in the desired range
@@ -305,13 +282,36 @@ function insertListDate(e) {
   listDateCell.setValue(formattedDate);
 }
 
-// For the MF for NP Sheet - Automatically inserts today's date into the list date cell whenever a new row is added
+// For the MF for NP Sheet - Automatically inserts today's date into the list date cell whenever a liquid is added or strikes through the row if the complete date is filled, and removes values and formatting if the cell is empty
 function insertNPListDate(e) {
-  Logger.log("Insert List Date function triggered");
-  if (e.range.getNumColumns() == 1 && e.range.getNumRows() == 1 && e.range.getColumn() == 1) {
-    let currentRow = e.range.getRow();
-    let listDateCell = mfForNpSheet.getRange(currentRow, 3, 1, 1);
-    listDateCell.setValue(formattedDate);
+  Logger.log("Insert NP List Date function triggered");
+  let currentRow = e.range.getRow();
+  let editedValue = e.range.getValue();
+  if (currentRow >= 5 && currentRow <= 24) {
+    if (e.range.getColumn() >= 2 && e.range.getColumn() <= 7) {
+      // If a cell is edited, fill the list date automatically
+      mfForNpSheet.getRange(currentRow, 8).setValue(editedValue ? formattedDate : '');
+    } else if (e.range.getColumn() == 9) {
+      // If the complete date is filled, strikes through the eliquid cells on that row
+      mfForNpSheet.getRange(currentRow, 2, 1, 6).setFontLine(editedValue ? "line-through" : "none");
+    }
+  }
+}
+
+// Insert checkboxes on the MF for NP Vending Sheet when a new row is added
+function onEditVendingFormat(e) {
+  let editedRow = e.range.getRow();
+  let currentRow = e.range.getRow();
+  let editedValue = e.range.getValue();
+  let isIntersecting = (e.range.getColumn() >= 1 && e.range.getColumn() <= 2) // Columns A and B
+  if (isIntersecting) {
+    Logger.log("onEditVendingFormat function triggered")
+    if (editedRow < 3) {
+      return;
+    }
+    mfForNpVendingSheet.getRange(currentRow, 5).setValue(editedValue ? formattedDate : '');
+    let transferBoxTarget = mfForNpVendingSheet.getRange(editedRow, 6); // column F
+    transferBoxTarget.setDataValidation(checkBox);
   }
 }
 
@@ -335,7 +335,9 @@ function onEditSheetCheck(e) {
   } else if (sheetName === 'MF for NP') {
     Logger.log('MF for NP Sheet is being edited');
     timeoutFunction(() => insertNPListDate(e), 10000, 'insertNPListDate');
-    timeoutFunction(() => onEditVendingCheckbox(e), 10000, 'onEditVendingCheckbox');
+  } else if (sheetName === 'MF for NP Vending') {
+    Logger.log('MF for NP Vending Sheet is being edited');
+    timeoutFunction(() => onEditVendingFormat(e), 10000, 'onEditVendingCheckbox');
   } else if (sheetName === 'Requests') {
     Logger.log('Requests Sheet is being edited');
     timeoutFunction(() => onCheckMoveRow(e), 10000, 'onCheckMoveRow');
