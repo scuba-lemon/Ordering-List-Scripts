@@ -68,22 +68,22 @@ Helper Functions:
 On Edit Functions:
 ---
   - onEditVendingCheckbox(e)
-    - Inserts a checkbox when a new row is added for vending
+    - Executor - inserts a checkbox when a new row is added for vending
 
   - onEditTriggerDropDown(e)
-    - Inserts a drop down with options for the brand, based on the category in the previous drop down
+    - Executor - inserts a drop down with options for the brand, based on the category in the previous drop down
 
   - onEditTriggerDevices(e)
-    - Inserts a drop down with options for the device, based on the category and brand in the previous drop downs
+    - Executor - inserts a drop down with options for the device, based on the category and brand in the previous drop downs
 
   - onEditUpdateDropdowns(e)
-    - Updates the options within the drop down menus for brands when any of the lists with the values for the menus are edited
+    - Executor - updates the options within the drop down menus for brands when any of the lists with the values for the menus are edited
 
   - onEditUpdateDevices(e)
-    - Updates the options within the drop down menus for devices when any of the lists with the values for the menus are edited
+    - Executor - updates the options within the drop down menus for devices when any of the lists with the values for the menus are edited
 
   - onEditFormatRules(e)
-    - Logic to apply formatting rules when the correct conditions are met
+    - Logic - applies formatting rules when the correct conditions are met
 
   - insertListDate(e)
     - Executor - Inserts today's date when a new row is added to the Ordering List sheet
@@ -92,10 +92,10 @@ On Edit Functions:
     - Executor - Inserts today's date when a new row is added to the MF for NP sheet
 
   - onEditVendingFormat(e)
-    - Logic to apply formatting rules when the correct conditions are met
+    - Logic - applies formatting rules when the correct conditions are met
 
   - onEditSheetCheck(e)
-    - Logic to apply formatting rules based on the sheet being edited
+    - Logic - applies formatting rules based on the sheet being edited
 
   - onEdit(e)
     - Executor - runs all onEdit subfunctions with a time-out for error handling
