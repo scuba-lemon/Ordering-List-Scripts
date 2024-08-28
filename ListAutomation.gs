@@ -1,3 +1,33 @@
+function sumQuantities(data, key) {
+  return Object.values(data.reduce((acc, item) => {
+    const quantity = Number(item.quantity);
+    if (isNaN(quantity)) {
+      console.warn(`Skipping non-numeric quantity: ${item.quantity}`);
+      return acc;
+    }
+
+    let sumKey = item.category === "Kits" || item.category === "Mech" || 
+                 item.category === "Mods" || item.category === "Tanks" 
+                 ? item.itemName 
+                 : item[key];
+    
+    if (key === "variation") {
+      sumKey = `${item.itemName} - ${item.variation}`;
+    }
+    
+    if (!acc[sumKey]) {
+      acc[sumKey] = {
+        category: item.category,
+        itemName: item.itemName,
+        variation: item.variation,
+        sum: 0
+      };
+    }
+    acc[sumKey].sum += quantity;
+    return acc;
+  }, {}));
+};
+
 function updateProductLists() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const salesSheet = ss.getSheetByName("Sales");
@@ -5,12 +35,12 @@ function updateProductLists() {
   const data = salesSheet.getDataRange().getValues();
   const salesData = data.slice(1).map(row => ({
     date: row[0],        // Column A
-    category: row[3],    // Column D
-    itemName: row[4],    // Column E
+    category: String(row[3]),    // Column D
+    itemName: String(row[4]),    // Column E
     quantity: row[5],    // Column F
-    variation: row[6],   // Column G
-    modifier: row[8],    // Column I
-    location: row[19]    // Column T
+    variation: String(row[6]),   // Column G
+    modifier: String(row[8]),    // Column I
+    location: String(row[19])    // Column T
   }));
 
   createDateNamedSheet();
@@ -94,26 +124,6 @@ function processList(salesData, filterValue, sheetName, sumBy, sortByCategory, f
     summedData.sort((a, b) => a.category.localeCompare(b.category));
   }
   writeDataByLocation(summedData, sheetName);
-};
-
-function sumQuantities(data, key) {
-  return Object.values(data.reduce((acc, item) => {
-    let sumKey = item.category === "Kits" || item.category === "Mech" || 
-                 item.category === "Mods" || item.category === "Tanks" 
-                 ? item.itemName 
-                 : item[key];
-                 
-    if (!acc[sumKey]) {
-      acc[sumKey] = {
-        category: item.category,
-        itemName: item.itemName,
-        variation: item.variation,
-        sum: 0
-      };
-    }
-    acc[sumKey].sum += item.quantity;
-    return acc;
-  }, {}));
 };
 
 function writeDataByLocation(data, sheetName) {
@@ -247,7 +257,7 @@ function hideUnsortedNomoItems(sheet) {
       rowsToHide.add(i + 2);
     }
   });
-  
+
   rowsToHide.forEach(row => sheet.hideRows(row));
 };
 
