@@ -210,21 +210,22 @@ function hideUnsortedNomoItems(sheet) {
   
   valuesA.forEach((valueA, i) => {
     const valueB = valuesB[i][0].toString();
-    const valueAString = valueA[0].toString();
-    
-    if ((valueA[0] && valueAString.startsWith("00")) || 
+    if ((valueA[0] && valueA[0].toString().startsWith("00")) || 
         (valueB && valueB.startsWith("00"))) {
       sheet.hideRows(i + 2);
-    } else if ((valueAString.startsWith("X") && !valueAString.includes("XL 3g") && !valueAString.includes("Xros")) || 
-               (valueB.startsWith("X") && !valueB.includes("XL 3g") && !valueB.includes("Xros"))) {
+    } else if ((valueA[0].toString().startsWith("X") && !valueA[0].includes("XL 3g")) || 
+               (valueB.startsWith("X") && !valueB.includes("XL 3g"))) {
       sheet.hideRows(i + 2);
-    }
+    } else if ((valueA[0].toString().startsWith("X") && !valueA[0].includes("Xros")) || 
+               (valueB.startsWith("X") && !valueB.includes("Xros"))) {
+      sheet.hideRows(i + 2);
+    };
   });
 
-  quantityValues.forEach((value, i) => {
+ quantityValues.forEach((value, i) => {
     if (value[0] < 1) {
       sheet.hideRows(i + 2);
-    }
+    };
   });
 };
 
