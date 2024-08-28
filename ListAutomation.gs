@@ -227,8 +227,6 @@ function hideUnsortedNomoItems(sheet) {
   const valuesA = sheet.getRange(`A2:A${lastRow}`).getValues();
   const valuesB = sheet.getRange(`B2:B${lastRow}`).getValues();
   const quantityValues = sheet.getRange(`D2:D${lastRow}`).getValues();
-
-  // First pass: Hide rows based on item names
   const rowsToHide = new Set();
 
   valuesA.forEach((valueA, i) => {
@@ -237,8 +235,6 @@ function hideUnsortedNomoItems(sheet) {
       rowsToHide.add(i + 2);
     }
   });
-
-  // Second pass: Hide rows based on variation names if not already hidden
   valuesB.forEach((valueB, i) => {
     const valueBString = valueB[0].toString().toLowerCase();
     if ((!rowsToHide.has(i + 2) && valueBString.startsWith("x") &&
@@ -246,15 +242,12 @@ function hideUnsortedNomoItems(sheet) {
       rowsToHide.add(i + 2);
     }
   });
-
-  // Hide rows based on quantity
   quantityValues.forEach((value, i) => {
     if (value[0] < 1) {
       rowsToHide.add(i + 2);
     }
   });
-
-  // Apply hiding
+  
   rowsToHide.forEach(row => sheet.hideRows(row));
 };
 
