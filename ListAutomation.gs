@@ -6,13 +6,14 @@ function sumQuantities(data, key) {
       return acc;
     }
 
-    let sumKey = item.category === "Kits" || item.category === "Mech" || 
-                 item.category === "Mods" || item.category === "Tanks" 
-                 ? item.itemName 
-                 : item[key];
-    
-    if (key === "variation") {
-      sumKey = `${item.itemName} - ${item.variation}`;
+    let sumKey;
+    if (item.category === "Kits" || item.category === "Mech" || 
+        item.category === "Mods" || item.category === "Tanks") {
+      sumKey = item.itemName;
+    } else {
+      sumKey = key === "variation" 
+        ? `${item.itemName} - ${item.variation}` 
+        : item.itemName;
     }
     
     if (!acc[sumKey]) {
@@ -134,12 +135,12 @@ function writeDataByLocation(data, sheetName) {
   
   let rows = data.map(item => {
     let variation = item.variation;
-    if (!variation || variation === "Regular" || 
+    if (!variation || variation === "Regular" || variation === "" || 
         item.category === "Kits" || item.category === "Mech" || 
         item.category === "Mods" || item.category === "Tanks") {
       let parts = item.itemName.split("- ");
       variation = parts.length > 1 ? parts[1] : "";
-    };
+    }
     return [item.itemName, variation, item.category, item.sum];
   });
 
