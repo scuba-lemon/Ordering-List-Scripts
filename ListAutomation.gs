@@ -31,6 +31,34 @@ function updateProductLists() {
   formatList(ss.getSheetByName("North Port"));
 };
 
+function createDateNamedSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const formatDate = (date) => `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+
+  const recentDate = formatDate(findMostRecentDate());
+  const oldestDate = formatDate(findOldestDate());
+  const sheetName = `Date: ${oldestDate} - ${recentDate}`;
+
+  ss.getSheets().forEach(sheet => {
+    if (sheet.getName().startsWith("Date")) ss.deleteSheet(sheet);
+  });
+  ss.insertSheet(sheetName);
+};
+
+function findMostRecentDate() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
+  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
+  const recentDate = new Date(Math.max(...dates.filter(Boolean).map(date => new Date(date))));
+  return recentDate;
+};
+
+function findOldestDate() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
+  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
+  const oldestDate = new Date(Math.min(...dates.filter(Boolean).map(date => new Date(date))));
+  return oldestDate;
+};
+
 function createOrReplaceSheet(ss, sheetName) {
   let sheet = ss.getSheetByName(sheetName);
   if (sheet) ss.deleteSheet(sheet);
@@ -48,11 +76,6 @@ function processList(salesData, filterValue, sheetName, sumBy, sortByCategory, f
     summedData.sort((a, b) => a.category.localeCompare(b.category));
   }
   writeDataByLocation(summedData, sheetName);
-};
-
-function writeData(sheet, headers, rows) {
-  sheet.getRange(1, 1, headers.length, headers[0].length).setValues(headers);
-  sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
 };
 
 function sumQuantities(data, key) {
@@ -105,7 +128,8 @@ function processLiquidSalesData(data, sheet) {
   const filteredData = data.filter(item => item.category === "Mighty Fine");
   const headers = [["Date", "Item", "Modifiers", "Qty"]];
   const rows = filteredData.map(item => [item.date, item.itemName, item.modifier, item.quantity]);
-  writeData(sheet, headers, rows);
+  sheet.getRange(1, 1, headers.length, headers[0].length).setValues(headers);
+  sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
 };
 
 function formatLiquidList(sheet) {
@@ -175,34 +199,6 @@ function hideOldRows(sheet) {
       sheet.hideRows(i + 2);
     };
   });
-};
-
-function createDateNamedSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const formatDate = (date) => `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
-
-  const recentDate = formatDate(findMostRecentDate());
-  const oldestDate = formatDate(findOldestDate());
-  const sheetName = `Date: ${oldestDate} - ${recentDate}`;
-
-  ss.getSheets().forEach(sheet => {
-    if (sheet.getName().startsWith("Date")) ss.deleteSheet(sheet);
-  });
-  ss.insertSheet(sheetName);
-};
-
-function findMostRecentDate() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
-  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
-  const recentDate = new Date(Math.max(...dates.filter(Boolean).map(date => new Date(date))));
-  return recentDate;
-};
-
-function findOldestDate() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
-  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
-  const oldestDate = new Date(Math.min(...dates.filter(Boolean).map(date => new Date(date))));
-  return oldestDate;
 };
 
 function onOpen() {
