@@ -31,13 +31,27 @@ function updateProductLists() {
   formatList(ss.getSheetByName("North Port"));
 };
 
+function findDateRange() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
+  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
+  const validDates = dates.filter(Boolean).map(date => new Date(date));
+  
+  if (validDates.length === 0) {
+    return { recentDate: null, oldestDate: null };
+  };
+
+  const recentDate = new Date(Math.max(...validDates));
+  const oldestDate = new Date(Math.min(...validDates));
+  return { recentDate, oldestDate };
+};
+
 function createDateNamedSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const formatDate = (date) => `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+  const { recentDate, oldestDate } = findDateRange();
+  if (!recentDate || !oldestDate) return;
 
-  const recentDate = formatDate(findMostRecentDate());
-  const oldestDate = formatDate(findOldestDate());
-  const sheetName = `Date: ${oldestDate} - ${recentDate}`;
+  const formatDate = (date) => `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+  const sheetName = `Date: ${formatDate(oldestDate)} - ${formatDate(recentDate)}`;
 
   ss.getSheets().forEach(sheet => {
     if (sheet.getName().startsWith("Date")) ss.deleteSheet(sheet);
@@ -45,18 +59,22 @@ function createDateNamedSheet() {
   ss.insertSheet(sheetName);
 };
 
-function findMostRecentDate() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
-  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
-  const recentDate = new Date(Math.max(...dates.filter(Boolean).map(date => new Date(date))));
-  return recentDate;
-};
+function hideOldRows(sheet) {
+  const { recentDate } = findDateRange();
+  if (!recentDate) return;
 
-function findOldestDate() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
-  const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
-  const oldestDate = new Date(Math.min(...dates.filter(Boolean).map(date => new Date(date))));
-  return oldestDate;
+  const oneWeekAgo = new Date(recentDate);
+  oneWeekAgo.setDate(recentDate.getDate() - 7);
+
+  const lastRow = sheet.getLastRow();
+  const values = sheet.getRange(`A2:A${lastRow}`).getValues();
+
+  values.forEach((date, i) => {
+    const rowDate = new Date(date[0]);
+    if (rowDate < oneWeekAgo || rowDate > recentDate) {
+      sheet.hideRows(i + 2);
+    }
+  });
 };
 
 function createOrReplaceSheet(ss, sheetName) {
@@ -106,7 +124,8 @@ function writeDataByLocation(data, sheetName) {
   
   let rows = data.map(item => {
     let variation = item.variation;
-    if (item.category === "Kits" || item.category === "Mech" || 
+    if (!variation || variation === "Regular" || 
+        item.category === "Kits" || item.category === "Mech" || 
         item.category === "Mods" || item.category === "Tanks") {
       let parts = item.itemName.split("- ");
       variation = parts.length > 1 ? parts[1] : "";
@@ -191,35 +210,21 @@ function hideUnsortedNomoItems(sheet) {
   
   valuesA.forEach((valueA, i) => {
     const valueB = valuesB[i][0].toString();
-    if ((valueA[0] && valueA[0].toString().startsWith("00")) || 
+    const valueAString = valueA[0].toString();
+    
+    if ((valueA[0] && valueAString.startsWith("00")) || 
         (valueB && valueB.startsWith("00"))) {
       sheet.hideRows(i + 2);
-    } else if ((valueA[0].toString().startsWith("X") && !valueA[0].includes("XL 3g")) || 
-               (valueB.startsWith("X") && !valueB.includes("XL 3g"))) {
+    } else if ((valueAString.startsWith("X") && !valueAString.includes("XL 3g") && !valueAString.includes("Xros")) || 
+               (valueB.startsWith("X") && !valueB.includes("XL 3g") && !valueB.includes("Xros"))) {
       sheet.hideRows(i + 2);
-    };
+    }
   });
 
- quantityValues.forEach((value, i) => {
+  quantityValues.forEach((value, i) => {
     if (value[0] < 1) {
       sheet.hideRows(i + 2);
-    };
-  });
-};
-
-function hideOldRows(sheet) {
-  const recentDate = findMostRecentDate();
-  const oneWeekAgo = new Date(recentDate);
-  oneWeekAgo.setDate(recentDate.getDate() - 7);
-
-  const lastRow = sheet.getLastRow();
-  const values = sheet.getRange(`A2:A${lastRow}`).getValues();
-
-  values.forEach((date, i) => {
-    const rowDate = new Date(date[0]);
-    if (rowDate < oneWeekAgo || rowDate > recentDate) {
-      sheet.hideRows(i + 2);
-    };
+    }
   });
 };
 
