@@ -189,17 +189,37 @@ function formatLiquidList(sheet) {
 function applyConditionalFormatting(sheet, isLiquid = false) {
   const formatRange = sheet.getRange(isLiquid ? "C2:C" : "A2:B");
   const rules = sheet.getConditionalFormatRules();
+  const newRules = [];
+
   if (!isLiquid) {
-    rules.push(
-      SpreadsheetApp.newConditionalFormatRule().whenTextStartsWith("XL 3g - (").setBold(false).setBackground(null).setRanges([formatRange]).build(),
-      SpreadsheetApp.newConditionalFormatRule().whenTextStartsWith("X").setBold(true).setBackground("#e2e2e2").setRanges([formatRange]).build()
-    );
+    const conditions = [
+      { text: "XL 3g - (", bold: false, background: null },
+      { text: "XROS", bold: false, background: null },
+      { text: "Xros", bold: false, background: null },
+      { text: "xros", bold: false, background: null },
+      { text: "X", bold: true, background: "#e2e2e2" }
+    ];
+    conditions.forEach(cond => {
+      newRules.push(
+        SpreadsheetApp.newConditionalFormatRule()
+          .whenTextStartsWith(cond.text)
+          .setBold(cond.bold)
+          .setBackground(cond.background)
+          .setRanges([formatRange])
+          .build()
+      );
+    });
   } else {
-    rules.push(
-      SpreadsheetApp.newConditionalFormatRule().whenTextContains("30").setBold(true).setBackground("#e2e2e2").setRanges([formatRange]).build()
+    newRules.push(
+      SpreadsheetApp.newConditionalFormatRule()
+        .whenTextContains("30")
+        .setBold(true)
+        .setBackground("#e2e2e2")
+        .setRanges([formatRange])
+        .build()
     );
-  }
-  sheet.setConditionalFormatRules(rules);
+  };
+  sheet.setConditionalFormatRules(rules.concat(newRules));
 };
 
 function hideUnsortedNomoItems(sheet) {
@@ -207,26 +227,35 @@ function hideUnsortedNomoItems(sheet) {
   const valuesA = sheet.getRange(`A2:A${lastRow}`).getValues();
   const valuesB = sheet.getRange(`B2:B${lastRow}`).getValues();
   const quantityValues = sheet.getRange(`D2:D${lastRow}`).getValues();
-  
+
+  // First pass: Hide rows based on item names
+  const rowsToHide = new Set();
+
   valuesA.forEach((valueA, i) => {
-    const valueB = valuesB[i][0].toString();
-    if ((valueA[0] && valueA[0].toString().startsWith("00")) || 
-        (valueB && valueB.startsWith("00"))) {
-      sheet.hideRows(i + 2);
-    } else if ((valueA[0].toString().startsWith("X") && !valueA[0].includes("XL 3g")) || 
-               (valueB.startsWith("X") && !valueB.includes("XL 3g"))) {
-      sheet.hideRows(i + 2);
-    } else if ((valueA[0].toString().startsWith("X") && !valueA[0].includes("Xros")) || 
-               (valueB.startsWith("X") && !valueB.includes("Xros"))) {
-      sheet.hideRows(i + 2);
-    };
+    const valueAString = valueA[0].toString().toLowerCase();
+    if ((valueAString.startsWith("x")) || (valueAString.startsWith("00"))) {
+      rowsToHide.add(i + 2);
+    }
   });
 
- quantityValues.forEach((value, i) => {
-    if (value[0] < 1) {
-      sheet.hideRows(i + 2);
-    };
+  // Second pass: Hide rows based on variation names if not already hidden
+  valuesB.forEach((valueB, i) => {
+    const valueBString = valueB[0].toString().toLowerCase();
+    if ((!rowsToHide.has(i + 2) && valueBString.startsWith("x") &&
+        !valueBString.includes("xl 3g") && !valueBString.includes("xros")) ||  (valueBString.startsWith("00"))) {
+      rowsToHide.add(i + 2);
+    }
   });
+
+  // Hide rows based on quantity
+  quantityValues.forEach((value, i) => {
+    if (value[0] < 1) {
+      rowsToHide.add(i + 2);
+    }
+  });
+
+  // Apply hiding
+  rowsToHide.forEach(row => sheet.hideRows(row));
 };
 
 function onOpen() {
