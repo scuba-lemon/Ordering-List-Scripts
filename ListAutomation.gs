@@ -80,15 +80,20 @@ function processList(salesData, filterValue, sheetName, sumBy, sortByCategory, f
 
 function sumQuantities(data, key) {
   return Object.values(data.reduce((acc, item) => {
-    if (!acc[item[key]]) {
-      acc[item[key]] = {
+    let sumKey = item.category === "Kits" || item.category === "Mech" || 
+                 item.category === "Mods" || item.category === "Tanks" 
+                 ? item.itemName 
+                 : item[key];
+                 
+    if (!acc[sumKey]) {
+      acc[sumKey] = {
         category: item.category,
         itemName: item.itemName,
         variation: item.variation,
         sum: 0
       };
     }
-    acc[item[key]].sum += item.quantity;
+    acc[sumKey].sum += item.quantity;
     return acc;
   }, {}));
 };
