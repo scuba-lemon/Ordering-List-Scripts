@@ -103,7 +103,17 @@ function writeDataByLocation(data, sheetName) {
   let sheet = ss.getSheetByName(sheetName);
   sheet.getRange("A1").activate().setValue("");
   let headers = [["Item", "Variation", "Category", "Qty"]];
-  let rows = data.map(item => [item.itemName, item.variation, item.category, item.sum]);
+  
+  let rows = data.map(item => {
+    let variation = item.variation;
+    if (item.category === "Kits" || item.category === "Mech" || 
+        item.category === "Mods" || item.category === "Tanks") {
+      let parts = item.itemName.split("- ");
+      variation = parts.length > 1 ? parts[1] : "";
+    };
+    return [item.itemName, variation, item.category, item.sum];
+  });
+
   sheet.getRange(1, 1, headers.length, headers[0].length).setValues(headers);
   sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
 };
@@ -177,6 +187,7 @@ function hideUnsortedNomoItems(sheet) {
   const lastRow = sheet.getLastRow();
   const valuesA = sheet.getRange(`A2:A${lastRow}`).getValues();
   const valuesB = sheet.getRange(`B2:B${lastRow}`).getValues();
+  const quantityValues = sheet.getRange(`D2:D${lastRow}`).getValues();
   
   valuesA.forEach((valueA, i) => {
     const valueB = valuesB[i][0].toString();
@@ -186,7 +197,13 @@ function hideUnsortedNomoItems(sheet) {
     } else if ((valueA[0].toString().startsWith("X") && !valueA[0].includes("XL 3g")) || 
                (valueB.startsWith("X") && !valueB.includes("XL 3g"))) {
       sheet.hideRows(i + 2);
-    }
+    };
+  });
+
+ quantityValues.forEach((value, i) => {
+    if (value[0] < 1) {
+      sheet.hideRows(i + 2);
+    };
   });
 };
 
