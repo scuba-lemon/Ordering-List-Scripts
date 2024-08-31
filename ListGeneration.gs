@@ -35,10 +35,10 @@ function updateProductLists() {
 
   const data = salesSheet.getDataRange().getValues();
   const salesData = data.slice(1).map(row => ({
-    date: row[0],        // Column A
+    date: row[0],                // Column A
     category: String(row[3]),    // Column D
     itemName: String(row[4]),    // Column E
-    quantity: row[5],    // Column F
+    quantity: row[5],            // Column F
     variation: String(row[6]),   // Column G
     modifier: String(row[8]),    // Column I
     location: String(row[19])    // Column T
@@ -47,19 +47,19 @@ function updateProductLists() {
   createDateNamedSheet();
   
   // Venice
-  createOrReplaceSheet(ss, "Venice");
-  processList(salesData, "Mighty Fine Flavors", "Venice", "variation", true);
-  formatList(ss.getSheetByName("Venice"));
+  createOrReplaceSheet("Venice List");
+  processList(salesData, "Mighty Fine Flavors", "Venice List", "variation", true);
+  formatList(ss.getSheetByName("Venice List"));
 
   // Venice Liquid
-  createOrReplaceSheet(ss, "Venice Liquid");
-  processLiquidSalesData(salesData, ss.getSheetByName("Venice Liquid"));
-  formatLiquidList(ss.getSheetByName("Venice Liquid"));
+  createOrReplaceSheet("Venice Liquid List");
+  processLiquidSalesData(salesData, ss.getSheetByName("Venice Liquid List"));
+  formatLiquidList(ss.getSheetByName("Venice Liquid List"));
 
   // North Port
-  createOrReplaceSheet(ss, "North Port");
-  processList(salesData, "Mighty Fine Vape & Smoke | North Port", "North Port", "variation", true);
-  formatList(ss.getSheetByName("North Port"));
+  createOrReplaceSheet("North Port List");
+  processList(salesData, "Mighty Fine Vape & Smoke | North Port", "North Port List", "variation", true);
+  formatList(ss.getSheetByName("North Port List"));
 };
 
 function findDateRange() {
@@ -108,7 +108,8 @@ function hideOldRows(sheet) {
   });
 };
 
-function createOrReplaceSheet(ss, sheetName) {
+function createOrReplaceSheet(sheetName) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(sheetName);
   if (sheet) ss.deleteSheet(sheet);
   ss.insertSheet(sheetName);
@@ -132,15 +133,30 @@ function writeDataByLocation(data, sheetName) {
   let sheet = ss.getSheetByName(sheetName);
   sheet.getRange("A1").activate().setValue("");
   let headers = [["Item", "Variation", "Category", "Qty"]];
-  
+
   let rows = data.map(item => {
-    let variation = item.variation;
+    let variation = String(item.variation);
+
+    if (variation.toLowerCase() === "wed nov 20 2024 00:00:00 gmt-0500 (eastern standard time)") {
+      variation = "11-20";
+    };
+
+    // Ensure that any numeric-looking variation names (like "11-20" or "0-10") are not interpreted as dates
+    if (!isNaN(Date.parse(variation))) {
+      variation = "'" + variation; // Prepend a single quote to force it to be interpreted as a string
+    };
+
     if (!variation || variation === "Regular" || variation === "" || 
         item.category === "Kits" || item.category === "Mech" || 
         item.category === "Mods" || item.category === "Tanks") {
       let parts = item.itemName.split("- ");
       variation = parts.length > 1 ? parts[1] : "";
-    }
+    };
+
+    if (item.category === "Cones") {
+      item.category = "SStash";
+    };
+
     return [item.itemName, variation, item.category, item.sum];
   });
 
@@ -237,19 +253,32 @@ function hideUnsortedNomoItems(sheet) {
   const lastRow = sheet.getLastRow();
   const valuesA = sheet.getRange(`A2:A${lastRow}`).getValues();
   const valuesB = sheet.getRange(`B2:B${lastRow}`).getValues();
+  const valuesC = sheet.getRange(`C2:C${lastRow}`).getValues();
+  const valuesD = sheet.getRange(`D2:D${lastRow}`).getValues();
   const quantityValues = sheet.getRange(`D2:D${lastRow}`).getValues();
   const rowsToHide = new Set();
 
   valuesA.forEach((valueA, i) => {
     const valueAString = valueA[0].toString().toLowerCase();
-    if ((valueAString.startsWith("x")) || (valueAString.startsWith("00"))) {
+    if ((valueAString.startsWith("x ")) || (valueAString.startsWith("00"))) {
       rowsToHide.add(i + 2);
     }
   });
   valuesB.forEach((valueB, i) => {
     const valueBString = valueB[0].toString().toLowerCase();
-    if ((!rowsToHide.has(i + 2) && valueBString.startsWith("x") &&
-        !valueBString.includes("xl 3g") && !valueBString.includes("xros")) ||  (valueBString.startsWith("00"))) {
+    if ((!rowsToHide.has(i + 2) && valueBString.startsWith("x ")) ||  (valueBString.startsWith("00"))) {
+      rowsToHide.add(i + 2);
+    }
+  });
+  valuesC.forEach((valueC, i) => {
+    const valueCString = valueC[0].toString().toLowerCase();
+    if ((!rowsToHide.has(i + 2) && valueCString.startsWith("x ")) ||  (valueCString.startsWith("00"))) {
+      rowsToHide.add(i + 2);
+    }
+  });
+  valuesD.forEach((valueD, i) => {
+    const valueDString = valueD[0].toString().toLowerCase();
+    if ((!rowsToHide.has(i + 2) && valueDString.startsWith("x ")) ||  (valueDString.startsWith("00"))) {
       rowsToHide.add(i + 2);
     }
   });
@@ -263,5 +292,8 @@ function hideUnsortedNomoItems(sheet) {
 };
 
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Custom Menu').addItem('Make the lists!', 'updateProductLists').addToUi();
+  SpreadsheetApp.getUi().createMenu('Custom Menu')
+    .addItem('Make the lists!', 'updateProductLists')
+    .addItem('Compare the lists!', 'compareLists')
+    .addToUi();
 };
