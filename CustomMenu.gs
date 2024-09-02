@@ -84,6 +84,7 @@ function moveCompleteRows() {
     let transferNotesColumnM = 13; // Column M (Notes from Transfers Sheet)
     let dataRange = transfersSheet.getRange(2, 1, transfersSheet.getLastRow() - 1, transfersSheet.getLastColumn());
     let data = dataRange.getValues();
+    transfersSheet.appendRow(['']);
     // Prompt the user for Employee Initials
     let employee = Browser.inputBox('Enter Employee Initials');
 
@@ -102,7 +103,8 @@ function moveCompleteRows() {
         transfersSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
       }
     }
-
+    transfersSheet.deleteRow(transfersSheet.getLastRow());
+    
     // Add a thick black border to the bottom of the final row
     let lastRow = completeSheet.getLastRow();
     let lastColumn = completeSheet.getLastColumn();
