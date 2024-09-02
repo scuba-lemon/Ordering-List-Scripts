@@ -97,6 +97,11 @@ function writeMatchingResultsToSheet(sheet, data) {
 
   sheet.getDataRange().applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
   sheet.setFrozenRows(1);
+  sheet.getDataRange().createFilter();
+  sheet.getRange('D1').activate().getFilter().sort(2, true);
+  sheet.getRange('C1').activate().getFilter().sort(3, true);
+  sheet.getRange('B1').activate().getFilter().sort(2, true);
+  sheet.getRange('A1').activate().getFilter().sort(1, true);
   sheet.autoResizeColumn(1);
   sheet.setColumnWidth(2, 150);
   sheet.setColumnWidth(3, 150);
@@ -104,11 +109,6 @@ function writeMatchingResultsToSheet(sheet, data) {
   sheet.autoResizeColumn(5);
   sheet.autoResizeColumn(6);
   sheet.autoResizeColumn(7);
-  sheet.getDataRange().createFilter();
-  sheet.getRange('D1').activate().getFilter().sort(2, true);
-  sheet.getRange('C1').activate().getFilter().sort(3, true);
-  sheet.getRange('B1').activate().getFilter().sort(2, true);
-  sheet.getRange('A1').activate().getFilter().sort(1, true);
 };
 
 function writeNonMatchingResultsToSheet(sheet, data) {
@@ -127,7 +127,7 @@ function writeNonMatchingResultsToSheet(sheet, data) {
                 itemName = brand;
             };
 
-            if ((item.category === "sstash" && subCat !== "cones" && subCat !== "fluid") || item.category === "accessories") {
+            if ((item.category === "sstash" && subCat !== "cones" && subCat !== "fluid") || item.category === "accessories" || item.category === "vending") {
                 [brand, subCat] = [subCat, brand];
             } else if (item.category === "sstash" && subCat === "cones") {
                 item.variationName = brand + " - " + item.variationName;
@@ -181,16 +181,16 @@ function writeNonMatchingResultsToSheet(sheet, data) {
     sheet.setFrozenRows(1);
     sheet.getRange(1, 1, 1, sheet.getLastColumn()).setHorizontalAlignment('center');
     sheet.getRange(1, 4, sheet.getLastRow(), 2).setHorizontalAlignment('center');
-    sheet.setColumnWidth(5, 50);
-    sheet.setColumnWidth(4, 300);
-    sheet.setColumnWidth(3, 150);
-    sheet.setColumnWidth(2, 150);
-    sheet.setColumnWidth(1, 100);
     sheet.getDataRange().createFilter();
     sheet.getRange('D1').activate().getFilter().sort(2, true);
     sheet.getRange('C1').activate().getFilter().sort(3, true);
     sheet.getRange('B1').activate().getFilter().sort(2, true);
     sheet.getRange('A1').activate().getFilter().sort(1, true);
+    sheet.setColumnWidth(5, 50);
+    sheet.setColumnWidth(4, 300);
+    sheet.setColumnWidth(3, 150);
+    sheet.setColumnWidth(2, 150);
+    sheet.setColumnWidth(1, 100);
     hideUnsortedNomoItems(sheet);
 };
 
@@ -258,18 +258,22 @@ function compareLists() {
 
   createOrReplaceSheet("Venice - Listed");
   let veniceMatchSheet = ss.getSheetByName("Venice - Listed");
+  veniceMatchSheet.setTabColor(veniceColor);
   writeMatchingResultsToSheet(veniceMatchSheet, veniceMatches);
 
   createOrReplaceSheet("Venice - Unlisted");
   let veniceNonMatchingSheet = ss.getSheetByName("Venice - Unlisted");
+  veniceNonMatchingSheet.setTabColor(veniceColor);
   writeNonMatchingResultsToSheet(veniceNonMatchingSheet, veniceNotInOrdering);
 
   createOrReplaceSheet("North Port - Listed");
   let northPortMatchSheet = ss.getSheetByName("North Port - Listed");
+  northPortMatchSheet.setTabColor(npColor);
   writeMatchingResultsToSheet(northPortMatchSheet, northPortMatches);
 
   createOrReplaceSheet("North Port - Unlisted");
   let npNonMatchingsSheet = ss.getSheetByName("North Port - Unlisted");
+  npNonMatchingsSheet.setTabColor(npColor);
   writeNonMatchingResultsToSheet(npNonMatchingsSheet, northPortNotInOrdering);
   hideNPVending();
 };
