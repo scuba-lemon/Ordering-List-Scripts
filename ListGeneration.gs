@@ -29,39 +29,6 @@ function sumQuantities(data, key) {
   }, {}));
 };
 
-function updateProductLists() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const salesSheet = ss.getSheetByName("Sales");
-
-  const data = salesSheet.getDataRange().getValues();
-  const salesData = data.slice(1).map(row => ({
-    date: row[0],                // Column A
-    category: String(row[3]),    // Column D
-    itemName: String(row[4]),    // Column E
-    quantity: row[5],            // Column F
-    variation: String(row[6]),   // Column G
-    modifier: String(row[8]),    // Column I
-    location: String(row[19])    // Column T
-  }));
-
-  createDateNamedSheet();
-  
-  // Venice
-  createOrReplaceSheet("Venice List");
-  processList(salesData, "Mighty Fine Flavors", "Venice List", "variation", true);
-  formatList(ss.getSheetByName("Venice List"));
-
-  // Venice Liquid
-  createOrReplaceSheet("Venice Liquid List");
-  processLiquidSalesData(salesData, ss.getSheetByName("Venice Liquid List"));
-  formatLiquidList(ss.getSheetByName("Venice Liquid List"));
-
-  // North Port
-  createOrReplaceSheet("North Port List");
-  processList(salesData, "Mighty Fine Vape & Smoke | North Port", "North Port List", "variation", true);
-  formatList(ss.getSheetByName("North Port List"));
-};
-
 function findDateRange() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sales');
   const dates = sheet.getRange('A2:A' + sheet.getLastRow()).getValues().flat();
@@ -88,24 +55,6 @@ function createDateNamedSheet() {
     if (sheet.getName().startsWith("Date")) ss.deleteSheet(sheet);
   });
   ss.insertSheet(sheetName);
-};
-
-function hideOldRows(sheet) {
-  const { recentDate } = findDateRange();
-  if (!recentDate) return;
-
-  const oneWeekAgo = new Date(recentDate);
-  oneWeekAgo.setDate(recentDate.getDate() - 7);
-
-  const lastRow = sheet.getLastRow();
-  const values = sheet.getRange(`A2:A${lastRow}`).getValues();
-
-  values.forEach((date, i) => {
-    const rowDate = new Date(date[0]);
-    if (rowDate < oneWeekAgo || rowDate > recentDate) {
-      sheet.hideRows(i + 2);
-    }
-  });
 };
 
 function createOrReplaceSheet(sheetName) {
@@ -165,9 +114,7 @@ function writeDataByLocation(data, sheetName) {
 };
 
 function formatList(sheet) {
-  let range = sheet.getDataRange();
-
-  range.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+  sheet.getDataRange().applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
   sheet.setFrozenRows(1);
   sheet.getRange(1, 1, 1, sheet.getLastColumn()).setHorizontalAlignment('center');
   sheet.getRange(1, 2, sheet.getLastRow(), 3).setHorizontalAlignment('center');
@@ -176,7 +123,7 @@ function formatList(sheet) {
   sheet.setColumnWidth(2, 300);
   sheet.setColumnWidth(1, 250);
   
-  range.createFilter();
+  sheet.getDataRange().createFilter();
   sheet.getRange('B1').activate().getFilter().sort(2, true);
   sheet.getRange('A1').activate().getFilter().sort(1, true);
   sheet.getRange('C1').activate().getFilter().sort(3, true);
@@ -194,9 +141,7 @@ function processLiquidSalesData(data, sheet) {
 };
 
 function formatLiquidList(sheet) {
-  let range = sheet.getDataRange();
-
-  range.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+  sheet.getDataRange().applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
   sheet.setFrozenRows(1);
   sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).setHorizontalAlignment('center');
   sheet.setColumnWidth(4, 50);
@@ -204,7 +149,7 @@ function formatLiquidList(sheet) {
   sheet.setColumnWidth(2, 200);
   sheet.setColumnWidth(1, 100);
 
-  range.createFilter();
+  sheet.getDataRange().createFilter();
   sheet.getRange('C1').activate().getFilter().sort(3, true);
   sheet.getRange('B1').activate().getFilter().sort(2, true);
 
@@ -214,7 +159,7 @@ function formatLiquidList(sheet) {
 };
 
 function applyConditionalFormatting(sheet, isLiquid = false) {
-  const formatRange = sheet.getRange(isLiquid ? "C2:C" : "A2:B");
+  const formatRange = sheet.getRange(isLiquid ? "B2:C" : "A2:B");
   const rules = sheet.getConditionalFormatRules();
   const newRules = [];
 
@@ -247,6 +192,24 @@ function applyConditionalFormatting(sheet, isLiquid = false) {
     );
   };
   sheet.setConditionalFormatRules(rules.concat(newRules));
+};
+
+function hideOldRows(sheet) {
+  const { recentDate } = findDateRange();
+  if (!recentDate) return;
+
+  const oneWeekAgo = new Date(recentDate);
+  oneWeekAgo.setDate(recentDate.getDate() - 7);
+
+  const lastRow = sheet.getLastRow();
+  const values = sheet.getRange(`A2:A${lastRow}`).getValues();
+
+  values.forEach((date, i) => {
+    const rowDate = new Date(date[0]);
+    if (rowDate < oneWeekAgo || rowDate > recentDate) {
+      sheet.hideRows(i + 2);
+    }
+  });
 };
 
 function hideUnsortedNomoItems(sheet) {
@@ -289,6 +252,79 @@ function hideUnsortedNomoItems(sheet) {
   });
 
   rowsToHide.forEach(row => sheet.hideRows(row));
+};
+
+function altProcessLiquidSalesData(data, sheet) {
+  const filteredData = data.filter(item => item.category === "Mighty Fine");
+  const summary = new Map();
+
+  filteredData.forEach(item => {
+    const key = `${item.itemName}-${item.modifier}`;
+    if (!summary.has(key)) {
+      summary.set(key, { itemName: item.itemName, modifier: item.modifier, quantity: 0 });
+    }
+    summary.get(key).quantity += item.quantity;
+  });
+
+  const rows = Array.from(summary.values()).map(item => [item.itemName, item.modifier, item.quantity]);
+  const headers = [["Item", "Modifiers", "Qty"]];
+  sheet.getRange(1, 1, 1, headers[0].length).setValues(headers);
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+  };
+
+  sheet.getDataRange().applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+  sheet.setFrozenRows(1);
+  sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).setHorizontalAlignment('center');
+  sheet.setColumnWidth(3, 50);
+  sheet.setColumnWidth(2, 150);
+  sheet.setColumnWidth(1, 200);
+
+  sheet.getDataRange().createFilter();
+  sheet.getRange('B1').activate().getFilter().sort(2, true);
+  sheet.getRange('A1').activate().getFilter().sort(1, true);
+
+  const formatRange = sheet.getRange("B2:B");
+  const rules = sheet.getConditionalFormatRules();
+  const formattingRule = SpreadsheetApp.newConditionalFormatRule().whenTextContains("30").setBold(true).setBackground("#e2e2e2").setRanges([formatRange]).build();
+  sheet.setConditionalFormatRules(rules.concat(formattingRule));
+};
+
+function updateProductLists() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const salesSheet = ss.getSheetByName("Sales");
+
+  const data = salesSheet.getDataRange().getValues();
+  const salesData = data.slice(1).map(row => ({
+    date: row[0],                // Column A
+    category: String(row[3]),    // Column D
+    itemName: String(row[4]),    // Column E
+    quantity: row[5],            // Column F
+    variation: String(row[6]),   // Column G
+    modifier: String(row[8]),    // Column I
+    location: String(row[19])    // Column T
+  }));
+
+  createDateNamedSheet();
+  
+  // Venice
+  createOrReplaceSheet("Venice List");
+  processList(salesData, "Mighty Fine Flavors", "Venice List", "variation", true);
+  formatList(ss.getSheetByName("Venice List"));
+
+  // Venice Liquid
+  createOrReplaceSheet("Venice Liquid List");
+  processLiquidSalesData(salesData, ss.getSheetByName("Venice Liquid List"));
+  formatLiquidList(ss.getSheetByName("Venice Liquid List"));
+
+  // North Port
+  createOrReplaceSheet("North Port List");
+  processList(salesData, "Mighty Fine Vape & Smoke | North Port", "North Port List", "variation", true);
+  formatList(ss.getSheetByName("North Port List"));
+
+  // Alternate Venice Liquid
+  createOrReplaceSheet("Alt Venice Liquid List");
+  altProcessLiquidSalesData(salesData, ss.getSheetByName("Alt Venice Liquid List"));
 };
 
 function onOpen() {
