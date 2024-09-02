@@ -1,3 +1,6 @@
+const veniceColor = '#8d65db';
+const npColor = '#61b1d4';
+
 function sumQuantities(data, key) {
   return Object.values(data.reduce((acc, item) => {
     const quantity = Number(item.quantity);
@@ -309,21 +312,25 @@ function updateProductLists() {
   
   // Venice
   createOrReplaceSheet("Venice List");
+  ss.getSheetByName("Venice List").setTabColor(veniceColor);
   processList(salesData, "Mighty Fine Flavors", "Venice List", "variation", true);
   formatList(ss.getSheetByName("Venice List"));
 
   // Venice Liquid
   createOrReplaceSheet("Venice Liquid List");
+  ss.getSheetByName("Venice Liquid List").setTabColor(veniceColor);
   processLiquidSalesData(salesData, ss.getSheetByName("Venice Liquid List"));
   formatLiquidList(ss.getSheetByName("Venice Liquid List"));
 
   // North Port
   createOrReplaceSheet("North Port List");
+  ss.getSheetByName("North Port List").setTabColor(npColor);
   processList(salesData, "Mighty Fine Vape & Smoke | North Port", "North Port List", "variation", true);
   formatList(ss.getSheetByName("North Port List"));
 
   // Alternate Venice Liquid
   createOrReplaceSheet("Alt Venice Liquid List");
+  ss.getSheetByName("Alt Venice Liquid List").setTabColor(veniceColor);
   altProcessLiquidSalesData(salesData, ss.getSheetByName("Alt Venice Liquid List"));
 };
 
