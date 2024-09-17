@@ -42,9 +42,9 @@ function makeArray(columnLetter, columnNumber, sheet) {
   let goalRange = sheet.getRange(2, columnNumber, lastRow, 1);
   let finalArray = goalRange.getValues().flat().filter(Boolean).sort();
   return finalArray;
-}
+};
 
-// Generates checkboxes for the Transfer, New, Nomo, Req, and Complete columns, so that the sheet can use a filter without including the empty rows that would only contain checkboxes
+// Generates checkboxes for the New, Nomo, and Req columns, so that the sheet can use a filter without including the empty rows that would only contain checkboxes
 function createCheckBoxes(currentRow) {
   Logger.log("createCheckBoxes function triggered");
   
@@ -57,7 +57,7 @@ function createCheckBoxes(currentRow) {
   newTargetCell.setDataValidation(checkBox);
   nomoTargetCell.setDataValidation(checkBox);
   reqTargetCell.setDataValidation(checkBox);
-}
+};
 
 // Assigns the correct brands for each category
 function findBrands(category) {      
@@ -75,7 +75,7 @@ function findBrands(category) {
     brands.push(...deltaCos);
   }
   return brands;
-}
+};
 
 // Generates a drop down menu for brands based on the category selected
 function createBrandsMenu() {
@@ -96,7 +96,7 @@ function createBrandsMenu() {
 
   // Applies the drop down menu to the target cell in the subcategory column
   targetCell.setDataValidation(brandsDD);
-}
+};
 
 // Assigns the correct devices for each brand
 function findDevices(brand) {
@@ -143,7 +143,7 @@ function findDevices(brand) {
   }
 
   return devices;
-}
+};
 
 // Generates a drop down menu for devices based on the brand
 function createDevicesMenu() {
@@ -165,7 +165,7 @@ function createDevicesMenu() {
 
   // Applies the drop down menu to the target cell in the subcategory column
   subCatCell.setDataValidation(devicesDD);
-}
+};
 
 // Assigns the correct subcategory for each category
 function findSubCategory(category) {
@@ -186,13 +186,13 @@ function findSubCategory(category) {
   } else if (category == 'SStash') {
     subCategory.push(...stashSubs);
   } else if (category == 'Vending') {
-    subCategory.push('Candy', 'Soda', 'Other', 'N/A');
+    subCategory.push('Candy', 'Vintage Soda', 'Other', 'N/A');
   } else {
     subCategory.push('N/A');
   }
 
   return subCategory;
-}
+};
 
 // Generates a drop down menu for subcategories based on the category selected
 function createSubCategoryMenu() {
@@ -213,7 +213,7 @@ function createSubCategoryMenu() {
 
   // Applies the drop down menu to the target cell in the subcategory column
   targetCell.setDataValidation(subCategoryDD);
-}
+};
 
 // Function to transpose five columns of the Ordering List into an object, excluding empty rows and converting values to lowercase
 function transposeData() {
@@ -247,7 +247,7 @@ function transposeData() {
   // Remove the last entry from the products object so that the newest row added to the sheet can be compared to all previous values NOT including the new row
   delete products["row" + Object.keys(products).length];
   return products;
-}
+};
 
 // Function to transpose five columns of the spreadsheet into an object, excluding empty rows and converting values to lowercase
 function transposeNomos() {
@@ -278,7 +278,7 @@ function transposeNomos() {
     }
   }
   return nomos;
-}
+};
 
 // Checks for duplicate listings when a new item is added - if a duplicate is found it returns the row index of the original and duplicate rows
 function checkForDuplicateRow(e, products) {
@@ -326,7 +326,7 @@ function checkForDuplicateRow(e, products) {
     originalRowIndex: originalRowIndex,
     duplicateRowIndex: duplicateRowIndex
   };
-}
+};
 
 // Takes the indices returned by the checkForDuplicateRow function, and highlights the row based on the index returned for duplicate rows on the Order Sheet
 // Originally also highlighted the original row, but have commented that functionality out until/unless we decide to keep it
@@ -347,7 +347,7 @@ function highlightDuplicateRows(originalRowIndex, duplicateRowIndex) {
 
   //Logger.log("Original row highlighted: " + originalRowIndex);
   Logger.log("Duplicate row highlighted: " + duplicateRowIndex);
-}
+};
 
 // Takes the indices returned by the checkForDuplicateRow function, and highlights the row based on the index returned for duplicate rows from the Nomo Sheet
 function highlightDupicateNomos(originalRowIndex, duplicateRowIndex) {
@@ -364,7 +364,7 @@ function highlightDupicateNomos(originalRowIndex, duplicateRowIndex) {
 
   //Logger.log("Original row highlighted: " + originalRowIndex);
   Logger.log("Duplicate row highlighted: " + duplicateRowIndex);
-}
+};
 
 // Compares the order date to today's date, and if the date is older than 14 days, the cells will be highlighted
 function compareDates(valueInColumnI, row) {
@@ -393,7 +393,7 @@ function compareDates(valueInColumnI, row) {
     highlightCheckForBoxes(checkedColumn, row);
     Logger.log("Row " + row + ", Column I: " + valueInColumnI + " could not be parsed.");
   }
-}
+};
 
 // Runs on open to check for old ordering dates
 function oldOrderingEntries() {
@@ -411,7 +411,7 @@ function oldOrderingEntries() {
       compareDates(valueInColumnI, row); 
     }
   }
-} 
+};
 
 // Function to parse date strings in various formats
 function parseDate(dateStr) {
@@ -441,12 +441,11 @@ function parseDate(dateStr) {
     return null;
   }
   return date;
-}
+};
 
-// Function to check if any checkboxes in columns J, L, M, N, and O are checked for a given row
-// and return the column number of the first checked checkbox
+// Function to check if any checkboxes in columns A, J, M, and N are checked for a given row and return the column number of the first checked checkbox
 function checkCheckboxesInRow(row) {
-  let columnsToCheck = [10, 12, 13, 14, 15]; // Columns J, L, M, N, O
+  let columnsToCheck = [1, 10, 13, 14]; // Columns A, J, M, N
   for (let i = 0; i < columnsToCheck.length; i++) {
     let col = columnsToCheck[i];
     let cell = orderSheet.getRange(row, col);
@@ -455,27 +454,27 @@ function checkCheckboxesInRow(row) {
     // Check if the checkbox is checked
     if (value === true || value === 'TRUE') {
       return col; // Return the column number of the first checked checkbox
-    }
-  }
+    };
+  };
   return -1; // No checkboxes are checked
-}
+};
 
 // Function to highlight based on checked column
 function highlightCheckForBoxes(checkedColumn, row) {
   if (checkedColumn == 10) {  // If the "New" checkbox is checked, highlights the row
     Logger.log('New check triggered');
-    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor); // Change the background color as needed
-  } else if (checkedColumn == 12) {  // If the "Transfer" checkbox is checked, highlights the row
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(newColor);
+  } else if (checkedColumn == 12) {
     Logger.log('Transfer check triggered');
-    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor); // Change the background color as needed
-  } else if (checkedColumn == 13) {  // If the "Nomo" checkbox is checked, highlights the row
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(transferColor);
+  } else if (checkedColumn == 13) {
     Logger.log('Nomo check triggered');
-    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor); // Change the background color as needed
-  } else if (checkedColumn == 14) {  // If the "Req" checkbox is checked, highlights the row
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(nomoColor);
+  } else if (checkedColumn == 14) {
     Logger.log('Req check triggered');
-    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(reqColor); // Change the background color as needed
-  } else if (checkedColumn == 15) {  // If the "Complete" checkbox is checked, highlights the row
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(reqColor);
+  } else if (checkedColumn == 15) {
     Logger.log('Complete check triggered');
-    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor); // Change the background color as needed
-  }
-}
+    orderSheet.getRange(row, 1, 1, orderSheet.getLastColumn()).setBackground(completeColor);
+  };
+};
