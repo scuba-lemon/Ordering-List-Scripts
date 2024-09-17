@@ -274,6 +274,9 @@ function onCheckMoveRow(e) {
         orderSheet.getRange(orderSheet.getLastRow(), 1, 1, orderSheet.getLastColumn()).setBackground(reqColor)
         orderSheet.getRange(orderSheet.getLastRow(), 1, 1, 5).setFontLine("line-through");
 
+        // Remove data validation for the conditional drop downs
+        orderSheet.getRange(2, 3, orderSheet.getLastRow() - 1, 2).clearDataValidations();
+
         // Adds an empty row to the end of the sheet (to fix range errors), then alphabetizes the ordering list
         let lastRow = getLastDataRowInColumn("A", orderSheet);
         let numColumns = orderSheet.getLastColumn();
