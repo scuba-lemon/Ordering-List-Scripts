@@ -443,9 +443,9 @@ function parseDate(dateStr) {
   return date;
 };
 
-// Function to check if any checkboxes in columns A, J, M, and N are checked for a given row and return the column number of the first checked checkbox
+// Function to check if any checkboxes in columns J, M, and N are checked for a given row and return the column number of the first checked checkbox
 function checkCheckboxesInRow(row) {
-  let columnsToCheck = [1, 10, 13, 14]; // Columns A, J, M, N
+  let columnsToCheck = [10, 13, 14]; // Columns J, M, N
   for (let i = 0; i < columnsToCheck.length; i++) {
     let col = columnsToCheck[i];
     let cell = orderSheet.getRange(row, col);
