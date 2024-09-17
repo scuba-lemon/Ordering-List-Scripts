@@ -18,27 +18,23 @@ function moveTransferRows() {
       // Save the quantity for the item
       let quantity = orderingQuantityValueL;
 
-      // Move the values to the "Transfers" sheet with additional information
+      // Move the values to the Transfers sheet with additional information
       Logger.log("Appending row to Transfers Sheet");
-      transfersSheet.appendRow([...data[i].slice(0, 8), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
+      transfersSheet.appendRow(['', ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1]]);
       
-      // Select the cell in column L of the current row on the "Transfers" sheet and add a checkbox for the "Received" Column
-      let transferredRow = transfersSheet.getLastRow();
-      let checkboxCell = transfersSheet.getRange(transferredRow, 12);
-      checkboxCell.setDataValidation(checkBox);
+      // Add checkboxes for the Undo and Complete columns
+      transfersSheet.getRange(transfersSheet.getLastRow(), 1).setDataValidation(checkBox);
+      transfersSheet.getRange(transfersSheet.getLastRow(), 14).setDataValidation(checkBox);
       
       // Delete the row from the source sheet
       orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
-    }
-  }
+    };
+  };
 
   // Add a thick black border to the bottom of the final row
-  let lastRow = transfersSheet.getLastRow();
-  let lastColumn = transfersSheet.getLastColumn();
-  let lastRowRange = transfersSheet.getRange(lastRow, 1, 1, lastColumn);
-  lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  transfersSheet.getRange(transfersSheet.getLastRow(), 1, 1, transfersSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 
-}
+};
 
 // Moves rows to the Complete page
 function moveCompleteRows() {
@@ -63,7 +59,12 @@ function moveCompleteRows() {
         let quantity = orderingQuantityValueO;
 
         // Move the values to the "Complete" sheet with additional information
-        completeSheet.appendRow([...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
+        completeSheet.appendRow(['', ...data[i].slice(0, 9), formattedDate, quantity, employee, '', data[i][orderingNotesColumnP - 1], "O"]);
+
+        // Add checkboxes for the Undo column
+        completeSheet.getRange(completeSheet.getLastRow(), 1).setDataValidation(checkBox);
+
+        // Set bg color based on which sheet the row came from
         completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(completeColor);
 
         // Delete the row from the source sheet
@@ -72,16 +73,13 @@ function moveCompleteRows() {
     }   
 
     // Add a thick black border to the bottom of the final row
-    let lastRow = completeSheet.getLastRow();
-    let lastColumn = completeSheet.getLastColumn();
-    let lastRowRange = completeSheet.getRange(lastRow, 1, 1, lastColumn);
-    lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   
   } else if (sName == "Transfers") {
-    let transferQuantityColumnJ = 10; // Column J (Quantity from Transfers Sheet)
-    let transferSendingEmpColumnK = 11; // Column K (Quantity from Transfers Sheet)
-    let transferCheckboxColumnL = 12; // Column L (Checkbox from Transfers Sheet)
-    let transferNotesColumnM = 13; // Column M (Notes from Transfers Sheet)
+    let transferQuantityColumnL = 12; // Column L (Quantity from Transfers Sheet)
+    let transferSendingEmpColumnM = 13; // Column M (Sending Employee from Transfers Sheet)
+    let transferCheckboxColumnN = 14; // Column N (Checkbox from Transfers Sheet)
+    let transferNotesColumnO = 15; // Column O (Notes from Transfers Sheet)
     let dataRange = transfersSheet.getRange(2, 1, transfersSheet.getLastRow() - 1, transfersSheet.getLastColumn());
     let data = dataRange.getValues();
     transfersSheet.appendRow(['']);
@@ -90,33 +88,36 @@ function moveCompleteRows() {
 
     // Iterate through each row
     for (let i = data.length - 1; i >= 0; i--) {
-      let transferCheckboxValueM = data[i][transferCheckboxColumnL - 1]; // Adjust the index for JavaScript's 0-based indexing
+      let transferCheckboxValueM = data[i][transferCheckboxColumnN - 1]; // Adjust the index for JavaScript's 0-based indexing
 
       // Check if the checkbox is checked in column M
       if (transferCheckboxValueM === true || transferCheckboxValueM === 'TRUE') {
         
         // Move the values to the "Complete" sheet with additional information
-        completeSheet.appendRow([...data[i].slice(0, 9), formattedDate, data[i][transferQuantityColumnJ - 1], employee, data[i][transferSendingEmpColumnK - 1], data[i][transferNotesColumnM - 1], "T"]);
+        completeSheet.appendRow(['', ...data[i].slice(1, 10), formattedDate, data[i][transferQuantityColumnL - 1], employee, data[i][transferSendingEmpColumnM - 1], data[i][transferNotesColumnO - 1], "T"]);
+
+        // Add checkboxes for the Undo column
+        let newRow = completeSheet.getLastRow();
+        completeSheet.getRange(newRow, 1).setDataValidation(checkBox);
+
+        // Set bg color based on which sheet the row came from
         completeSheet.getRange(completeSheet.getLastRow(), 1, 1, completeSheet.getLastColumn()).setBackground(transferColor);
 
         // Delete the row from the source sheet
         transfersSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1 
-      }
-    }
+      };
+    };
     transfersSheet.deleteRow(transfersSheet.getLastRow());
     
     // Add a thick black border to the bottom of the final row
-    let lastRow = completeSheet.getLastRow();
-    let lastColumn = completeSheet.getLastColumn();
-    let lastRowRange = completeSheet.getRange(lastRow, 1, 1, lastColumn);
-    lastRowRange.setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    transfersSheet.getRange(transfersSheet.getLastRow(), 1, 1, transfersSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   
   } else { 
     console.log("Sheet name: " + sName)
     return; 
   };
 
-}
+};
 
 // Moves rows with checked boxes to the Nomo page
 function moveNomoRows() {
@@ -139,7 +140,53 @@ function moveNomoRows() {
       orderSheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
     }
   }
-} 
+};
+
+function moveUndoRows() {
+  let sheet = ss.getActiveSheet();
+  let dataRange = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
+  let data = dataRange.getValues();
+  let undoCheckboxColumnA = 1;
+  let notesColumnO = 15;
+  let orderOrTransferColumnP = 16; // Column P corresponds to index 15 in the array
+  
+  // Check if we are running on the "Complete" sheet
+  if (sheet.getName() === 'Complete') {
+    // Iterate through each row
+    for (let i = data.length - 1; i >= 0; i--) {
+      let undoCheckboxValueA = data[i][undoCheckboxColumnA - 1];
+      let orderOrTransferValue = data[i][orderOrTransferColumnP - 1]; // Value in column P ("O" or "T")
+
+      // Check if the checkbox is checked in column A
+      if (undoCheckboxValueA === true || undoCheckboxValueA === 'TRUE') {
+        if (orderOrTransferValue === 'O') {
+          // Move the values to the Ordering List sheet
+          orderSheet.appendRow([...data[i].slice(1, 10), '', '', '', '', '', '', data[i][notesColumnO - 1]]);
+
+          // Remove data validation for the conditional drop downs
+          orderSheet.getRange(2, 3, orderSheet.getLastRow() - 1, 2).clearDataValidations();
+
+          // Add checkboxes for the New, Nomo, and Req columns
+          orderSheet.getRange(orderSheet.getLastRow(), 10).setDataValidation(checkBox); // Column J - New
+          orderSheet.getRange(orderSheet.getLastRow(), 13).setDataValidation(checkBox); // Column M - Nomo
+          orderSheet.getRange(orderSheet.getLastRow(), 14).setDataValidation(checkBox); // Column N - Req
+
+        } else if (orderOrTransferValue === 'T') {
+          // Move the values to the Transfers sheet
+          transfersSheet.appendRow(['', ...data[i].slice(1, 12), data[i][13], "", data[i][notesColumnO - 1]]);
+
+          // Add checkboxes for Undo and Complete columns
+          transfersSheet.getRange(transfersSheet.getLastRow(), 1).setDataValidation(checkBox); // Column A - Undo
+          transfersSheet.getRange(transfersSheet.getLastRow(), 14).setDataValidation(checkBox); // Column N - Complete
+        };
+                // Delete the row from the original sheet
+        sheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
+      };
+    };
+    // Add a thick black border to the bottom of the final row
+    transfersSheet.getRange(transfersSheet.getLastRow(), 1, 1, transfersSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  };
+};
 
 // Sorts the data alphabetically
 function alphabeticalSort() {
@@ -171,7 +218,7 @@ function alphabeticalSort() {
       let lastRow = getLastDataRowInColumn("A", activeSheet);
       Logger.log("Alphabetizing the Transfers, Complete, or Nomo Sheet");
       range = activeSheet.getRange(2, 1, lastRow, activeSheet.getLastColumn());
-      range.sort([{column: 3, ascending: true}, {column: 4, ascending: true}, {column: 5, ascending: true}, {column: 6, ascending: true}]);
+      range.sort([{column: 4, ascending: true}, {column: 5, ascending: true}, {column: 6, ascending: true}, {column: 7, ascending: true}]);
     } else if (sName == "Drop Downs") {
       let lastRow = getLastDataRowInColumn("D", activeSheet);
       Logger.log("Alphabetizing the Drop Downs Sheet");
@@ -202,7 +249,7 @@ function alphabeticalSort() {
       }
     }
   }
-}
+};
 
 // Creates the custom menu option to run the custom functions
 function onOpen() {
@@ -213,7 +260,8 @@ function onOpen() {
     //.addItem('Move MF for NP Vending Transfers', 'moveVendingTransfers') | WORK IN PROGRESS
     .addItem('Move Nomo Rows', 'moveNomoRows')
     .addItem('Move Completed Rows', 'moveCompleteRows')
+    .addItem('Undo Moved Rows', 'moveUndoRows')
     .addItem('Show Older Ordering List Dates', 'oldOrderingEntries')
     .addToUi();
   oldOrderingEntries();
-}
+};
