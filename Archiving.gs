@@ -9,7 +9,7 @@ function moveAndClearCompleteSheet() {
 
   // Get the data from the source sheet
   let sourceSheet = sourceSpreadsheet.getSheetByName("Complete");
-  let data = sourceSheet.getRange(2, 1, sourceSheet.getLastRow() - 1, sourceSheet.getLastColumn()).getValues();
+  let data = sourceSheet.getRange(2, 2, sourceSheet.getLastRow() - 1, sourceSheet.getLastColumn()).getValues();
 
   // Create the destination sheet
   destinationSheet = destinationSpreadsheet.insertSheet(dateOnly);
