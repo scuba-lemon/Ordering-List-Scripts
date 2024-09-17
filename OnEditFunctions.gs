@@ -284,6 +284,7 @@ function insertListDate(e) {
 
 // For the MF for NP Sheet - Automatically inserts today's date into the list date cell whenever a liquid is added or strikes through the row if the complete date is filled, and removes values and formatting if the cell is empty
 function insertNPListDate(e) {
+  Logger.log("Insert NP list date function triggered")
   let currentRow = e.range.getRow();
   let editedValue = e.range.getValue();
   let listDateCell = mfForNpSheet.getRange(currentRow, 8); // Column H for list date
@@ -301,10 +302,8 @@ function insertNPListDate(e) {
     
     if (e.range.getColumn() >= 12 && e.range.getColumn() <= 18) { // Venice's Complete range
       if (!completeDateValue && !editedValue) { // (complete date WAS empty) AND (edited cell IS empty)
-          mfForNpSheet.getRange(currentRow, 12, 1, 6).setFontLine('none'); // Remove any strikethrough formatting
       } else if (!completeDateValue && editedValue) { // (complete date WAS empty) AND (the edited cell IS NOT empty)
         completeDateCell.setValue(formattedDate); // insert today's date in the Complete column
-        mfForNpSheet.getRange(editedRow, 12, 1, 6).setFontLine('line-through'); // strike through the row
       };
     };
 
