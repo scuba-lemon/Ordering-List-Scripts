@@ -164,7 +164,7 @@ function moveUndoRows() {
           orderSheet.appendRow([...data[i].slice(1, 10), '', '', '', '', '', '', data[i][notesColumnO - 1]]);
 
           // Remove data validation for the conditional drop downs
-          orderSheet.getRange(2, 3, orderSheet.getLastRow() - 1, 2).clearDataValidations();
+          orderSheet.getRange(orderSheet.getLastRow(), 3, 1, 2).clearDataValidations();
 
           // Add checkboxes for the New, Nomo, and Req columns
           orderSheet.getRange(orderSheet.getLastRow(), 10).setDataValidation(checkBox); // Column J - New
@@ -179,7 +179,7 @@ function moveUndoRows() {
           transfersSheet.getRange(transfersSheet.getLastRow(), 1).setDataValidation(checkBox); // Column A - Undo
           transfersSheet.getRange(transfersSheet.getLastRow(), 14).setDataValidation(checkBox); // Column N - Complete
         };
-                // Delete the row from the original sheet
+        // Delete the row from the original sheet
         sheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
       };
     };
@@ -197,7 +197,7 @@ function moveUndoRows() {
         orderSheet.appendRow([...data[i].slice(1, 10), '', '', '', '', '', '', data[i][notesColumnO - 1]]);
 
         // Remove data validation for the conditional drop downs
-        orderSheet.getRange(2, 3, orderSheet.getLastRow() - 1, 2).clearDataValidations();
+        orderSheet.getRange(orderSheet.getLastRow(), 3, 1, 2).clearDataValidations();
 
         // Add checkboxes for the New, Nomo, and Req columns
         orderSheet.getRange(orderSheet.getLastRow(), 10).setDataValidation(checkBox); // Column J - New
