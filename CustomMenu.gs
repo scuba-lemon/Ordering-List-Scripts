@@ -185,6 +185,29 @@ function moveUndoRows() {
     };
     // Add a thick black border to the bottom of the final row
     transfersSheet.getRange(transfersSheet.getLastRow(), 1, 1, transfersSheet.getLastColumn()).setBorder(null, null, true, null, null, null, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  } else if (sheet.getName() === 'Transfers') {
+    // Iterate through each row
+    for (let i = data.length - 1; i >= 0; i--) {
+      let undoCheckboxValueA = data[i][undoCheckboxColumnA - 1];
+      
+      // Check if the checkbox is checked in column A
+      if (undoCheckboxValueA === true || undoCheckboxValueA === 'TRUE') {
+        
+        // Move the values to the Ordering List sheet
+        orderSheet.appendRow([...data[i].slice(1, 10), '', '', '', '', '', '', data[i][notesColumnO - 1]]);
+
+        // Remove data validation for the conditional drop downs
+        orderSheet.getRange(2, 3, orderSheet.getLastRow() - 1, 2).clearDataValidations();
+
+        // Add checkboxes for the New, Nomo, and Req columns
+        orderSheet.getRange(orderSheet.getLastRow(), 10).setDataValidation(checkBox); // Column J - New
+        orderSheet.getRange(orderSheet.getLastRow(), 13).setDataValidation(checkBox); // Column M - Nomo
+        orderSheet.getRange(orderSheet.getLastRow(), 14).setDataValidation(checkBox); // Column N - Req
+
+        // Delete the row from the original sheet
+        sheet.deleteRow(i + 2); // Adding 2 because the loop starts from index 0 and row numbering starts from 1
+      }
+    };
   };
 };
 
